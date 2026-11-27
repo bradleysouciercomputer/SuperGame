@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-labelledby="title desc">
+<title id="title">Neon Tracks 3D game artwork</title><desc id="desc">A stylized three-dimensional runner sprints down a futuristic subway with neon rails and an approaching metro train.</desc>
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#101832"/><stop offset=".52" stop-color="#262653"/><stop offset="1" stop-color="#101a32"/></linearGradient>
+ <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#273752"/><stop offset="1" stop-color="#0d172a"/></linearGradient>
+ <linearGradient id="train" x2="0" y2="1"><stop stop-color="#6c91b1"/><stop offset=".23" stop-color="#294865"/><stop offset="1" stop-color="#132840"/></linearGradient>
+ <linearGradient id="glass" x2="1" y2="1"><stop stop-color="#a5f5ff"/><stop offset=".45" stop-color="#4786ba"/><stop offset="1" stop-color="#172f5d"/></linearGradient>
+ <linearGradient id="jacket" x2="1" y2="1"><stop stop-color="#c1a5ff"/><stop offset=".52" stop-color="#6c62b8"/><stop offset="1" stop-color="#293e73"/></linearGradient>
+ <linearGradient id="rail" x2="0" y2="1"><stop stop-color="#bcffff"/><stop offset=".4" stop-color="#61e5dd"/><stop offset="1" stop-color="#277d98"/></linearGradient>
+ <radialGradient id="haze"><stop stop-color="#5d55a8" stop-opacity=".52"/><stop offset="1" stop-color="#151d3d" stop-opacity="0"/></radialGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="17"/></filter>
+</defs>
+<rect width="1280" height="800" fill="url(#sky)"/><ellipse cx="640" cy="365" rx="590" ry="340" fill="url(#haze)"/>
+<g opacity=".65" stroke="#6e83ba" fill="none"><path d="M0 80 640 290 1280 80M0 170 640 310 1280 170M0 260 640 330 1280 260" stroke-width="3"/></g>
+<!-- station arches: strong perspective -->
+<path d="M-60 0h1400v110H-60Z" fill="#151f3c"/>
+<path d="M-50 110 0 30h1280l50 80" fill="none" stroke="#8b76cc" stroke-width="14" opacity=".55"/>
+<path d="M0 0 278 298M1280 0 1002 298" stroke="#43547c" stroke-width="25" opacity=".7"/>
+<path d="M75 0 312 290M1205 0 968 290" stroke="#75dbdf" stroke-width="8" opacity=".75" filter="url(#glow)"/>
+<g fill="#1b2845" stroke="#41577d" stroke-width="8">
+ <path d="M0 0h110v800H0zM1170 0h110v800h-110z"/>
+ <path d="M0 0 120 0 420 550 0 800ZM1280 0h-120L860 550l420 250Z" opacity=".75"/>
+</g>
+<!-- luminous station signs -->
+<g transform="translate(60 145)"><rect width="270" height="84" rx="10" fill="#111d38" stroke="#71e5df" stroke-width="4"/><rect x="12" y="12" width="246" height="60" rx="5" fill="#1a3150"/><text x="28" y="50" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="#d9ffff" letter-spacing="4">NEON METRO</text></g>
+<g transform="translate(965 170)"><rect width="248" height="70" rx="9" fill="#111d38" stroke="#a98bff" stroke-width="4"/><text x="22" y="43" font-family="Arial,sans-serif" font-size="23" font-weight="900" fill="#e9dfff" letter-spacing="3">LINE 03  →</text></g>
+<!-- city advertisements along walls -->
+<g opacity=".9"><rect x="16" y="350" width="145" height="160" rx="9" fill="#182b49" stroke="#69dadc" stroke-width="4"/><path d="M40 390h96M40 414h62M40 438h80" stroke="#a3f8ed" stroke-width="8"/><rect x="1115" y="390" width="148" height="150" rx="9" fill="#1b294b" stroke="#a28aff" stroke-width="4"/><circle cx="1188" cy="448" r="31" fill="#a58aff" opacity=".65"/><path d="M1150 500h75" stroke="#c8b9ff" stroke-width="8"/></g>
+<!-- oncoming metro train on right track -->
+<g transform="translate(920 325)">
+ <path d="M-156 0q0-60 50-90h212q50 30 50 90v300h-312Z" fill="url(#train)" stroke="#9bdfff" stroke-width="8"/>
+ <path d="M-100-72h200q31 22 39 61h-278q8-39 39-61Z" fill="url(#glass)" stroke="#c0faff" stroke-width="7"/>
+ <path d="M-2-70v57" stroke="#c2ffff" stroke-width="7"/>
+ <path d="M-140 18h280v18h-280Z" fill="#68e4e0"/><path d="M-135 60h270v22h-270Z" fill="#172e4b"/>
+ <g fill="#9cfaff"><rect x="-120" y="104" width="88" height="65" rx="5"/><rect x="32" y="104" width="88" height="65" rx="5"/></g>
+ <g fill="#e5f5ff"><rect x="-116" y="108" width="80" height="57" rx="3"/><rect x="36" y="108" width="80" height="57" rx="3"/></g>
+ <g fill="#ffcf87"><rect x="-131" y="245" width="44" height="18" rx="8"/><rect x="87" y="245" width="44" height="18" rx="8"/></g>
+ <path d="M-140 285h280v15h-280Z" fill="#0b1b31"/>
+</g>
+<!-- converging three track lanes and polished rails -->
+<path d="M0 800 540 372 740 372 1280 800Z" fill="url(#floor)"/>
+<path d="M0 800 552 390 570 390 235 800Z" fill="#263b55" opacity=".8"/>
+<path d="M1045 800 710 390 728 390 1280 800Z" fill="#263b55" opacity=".8"/>
+<g stroke="url(#rail)" fill="none" stroke-linecap="round">
+ <path d="M145 800 562 390M380 800 600 390M900 800 680 390M1135 800 718 390" stroke-width="13"/>
+ <path d="M145 800 562 390M380 800 600 390M900 800 680 390M1135 800 718 390" stroke="#ddffff" stroke-width="3" opacity=".7"/>
+</g>
+<g stroke="#8ca2bc" stroke-width="9" opacity=".7">
+ <path d="M450 800 590 390M575 800 625 390M705 800 648 390M830 800 676 390" stroke-width="8" stroke-dasharray="22 18"/>
+</g>
+<path d="M0 780 540 370M1280 780 740 370" stroke="#5be2dc" stroke-width="25" opacity=".2" filter="url(#glow)"/>
+<!-- collectible orbs -->
+<g fill="#ffdf83" stroke="#fff6cf" stroke-width="4"><circle cx="450" cy="530" r="17"/><circle cx="416" cy="575" r="13"/><circle cx="375" cy="625" r="10"/></g>
+<g fill="#fff"><circle cx="450" cy="530" r="5"/><circle cx="416" cy="575" r="4"/><circle cx="375" cy="625" r="3"/></g>
+<!-- character seen from behind, in mid-stride -->
+<ellipse cx="650" cy="733" rx="90" ry="22" fill="#050e1c" opacity=".65"/>
+<g transform="translate(650 600)">
+ <path d="M-20 50q-43 28-64 75l33 29q53-24 82-68Z" fill="#242f4c" stroke="#786bc2" stroke-width="9"/>
+ <path d="M-75 146q-29 21-33 38l70 10 28-25Z" fill="#17243d" stroke="#6ee2dc" stroke-width="6"/>
+ <path d="M22 50q47 13 66 62l-28 35q-50-21-72-64Z" fill="#242f4c" stroke="#786bc2" stroke-width="9"/>
+ <path d="M73 140q26 20 39 37l-72 12-25-24Z" fill="#17243d" stroke="#a18bff" stroke-width="6"/>
+ <path d="M-41-7q42-24 82 0l28 84q-66 42-138 0Z" fill="url(#jacket)" stroke="#d7c8ff" stroke-width="7"/>
+ <path d="M-37 0q36 20 74 0l14 66q-52 30-103 0Z" fill="#273c70"/>
+ <path d="M-43 22h88M-37 40h76" stroke="#9c8de1" stroke-width="7"/>
+ <rect x="-27" y="2" width="54" height="72" rx="12" fill="#172c49" stroke="#b4a6ff" stroke-width="5"/>
+ <rect x="-18" y="19" width="36" height="12" rx="5" fill="#68e8df"/>
+ <path d="M-40-21q1-48 40-53 40 5 40 53l-10 32q-31 17-60 0Z" fill="#1b2a47" stroke="#a995ff" stroke-width="7"/>
+ <path d="M-30-24q30-24 60 0" stroke="#75e8e0" stroke-width="6" fill="none"/>
+ <path d="M-25-75q25-30 50 0" stroke="#d9c8ff" stroke-width="5" fill="none"/>
+ <path d="M-6-80h12" stroke="#fff" stroke-width="4"/>
+ <path d="M-38 15h-18l-12 18 22 16 17-18ZM38 15h18l12 18-22 16-17-18Z" fill="#5e548f" stroke="#c0b2ff" stroke-width="5"/>
+ <path d="M-57 45-68 65l21 11 17-24M57 45 68 65 47 76 30 52" fill="#b3a2f8"/>
+ <path d="M-23 80h46" stroke="#68e8df" stroke-width="8"/>
+</g>
+<g transform="translate(64 55)"><rect width="300" height="42" rx="21" fill="#10172d" fill-opacity=".6" stroke="#b9d8fa" stroke-opacity=".3"/><circle cx="23" cy="21" r="6" fill="#8ceaca"/><text x="42" y="27" fill="#edf6ff" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="3">NEON TRACKS 3D</text></g>
+</svg>
