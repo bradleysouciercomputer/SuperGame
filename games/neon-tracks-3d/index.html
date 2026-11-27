@@ -506,12 +506,12 @@
       function resetGame(){
         cleanupWorldObjects();score=0;coins=0;lives=3;elapsed=0;speed=19;lane=1;laneCooldown=0;jumpVelocity=0;jumpY=0;slideTime=0;hitCooldown=0;
         spawnTimer=1.25;patternCount=0;shake=0;flash=0;newBest=false;runner.position.set(0,0,playerZ);runnerBody.scale.set(1,1,1);runnerBody.position.y=0;
-        state="running";showOverlay("");updatePauseButton();updateHud();getAudio();lastTime=performance.now();
+        state="running";showOverlay("");updatePauseButton();updateHud();getAudio();
       }
       function startGame(){resetGame();spawnPattern();spawnCoinsRow();}
       function pauseGame(){
         if(state==="running"){state="paused";showOverlay("pause");}
-        else if(state==="paused"){state="running";showOverlay("");lastTime=performance.now();getAudio();}
+        else if(state==="paused"){state="running";showOverlay("");getAudio();}
         updatePauseButton();
       }
       function endGame(){
