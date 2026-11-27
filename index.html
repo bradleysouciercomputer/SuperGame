@@ -443,7 +443,7 @@
         description: "Jump, dodge, and chase your high score.",
         url: "games/neon-dash/",
         category: "Endless Runner",
-        filter: "runner",
+        filters: ["runner"],
         format: "2D",
         thumbnail: "games/neon-dash/thumbnail.svg",
         color: "#332b7a"
@@ -453,7 +453,7 @@
         description: "Blast through waves and defend the outpost.",
         url: "games/starfall/",
         category: "Space Shooter",
-        filter: "shooter",
+        filters: ["shooter"],
         format: "2D",
         thumbnail: "games/starfall/thumbnail.svg",
         color: "#124f83"
@@ -463,7 +463,7 @@
         description: "Run the futuristic metro in SuperGame's first 3D game.",
         url: "games/neon-tracks-3d/",
         category: "Endless Runner",
-        filter: "3d",
+        filters: ["runner", "3d"],
         format: "3D",
         thumbnail: "games/neon-tracks-3d/thumbnail.svg",
         color: "#332b7a"
@@ -548,7 +548,7 @@
     function renderGames() {
       const query = searchInput.value.trim().toLowerCase();
       const visibleGames = games.filter(function (game) {
-        const matchesFilter = activeFilter === "all" || game.filter === activeFilter;
+        const matchesFilter = activeFilter === "all" || (game.filters || []).includes(activeFilter);
         const searchable = [game.title, game.description, game.category, game.format].join(" ").toLowerCase();
         return matchesFilter && searchable.includes(query);
       });
