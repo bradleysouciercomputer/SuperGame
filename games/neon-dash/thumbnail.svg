@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800" role="img" aria-labelledby="title desc">
+<title id="title">Neon Dash game artwork</title><desc id="desc">A glowing arcade runner leaps across a platform above a futuristic sunset city.</desc>
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#28245d"/><stop offset=".5" stop-color="#7654a2"/><stop offset="1" stop-color="#ef8a9c"/></linearGradient>
+ <linearGradient id="ground" x2="0" y2="1"><stop stop-color="#273e68"/><stop offset="1" stop-color="#101c35"/></linearGradient>
+ <linearGradient id="suit" x2="1" y2="1"><stop stop-color="#c9acff"/><stop offset=".5" stop-color="#67e7dc"/><stop offset="1" stop-color="#2875a8"/></linearGradient>
+ <linearGradient id="rail" x2="0" y2="1"><stop stop-color="#b2ffe6"/><stop offset=".4" stop-color="#5adbc8"/><stop offset="1" stop-color="#284d70"/></linearGradient>
+ <radialGradient id="sun"><stop stop-color="#fff0c8"/><stop offset=".7" stop-color="#ffc6a3"/><stop offset="1" stop-color="#f5a1b7" stop-opacity="0"/></radialGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="14"/></filter><filter id="soft"><feGaussianBlur stdDeviation="4"/></filter>
+ <pattern id="windows" width="36" height="42" patternUnits="userSpaceOnUse"><rect x="7" y="7" width="10" height="17" rx="2" fill="#7de9dc" opacity=".48"/><rect x="23" y="7" width="7" height="17" rx="2" fill="#c1a4ff" opacity=".32"/></pattern>
+</defs>
+<rect width="1280" height="800" fill="url(#sky)"/>
+<circle cx="930" cy="190" r="180" fill="#ffdcb3" opacity=".55" filter="url(#glow)"/><circle cx="930" cy="190" r="105" fill="url(#sun)"/>
+<g fill="#fff0df" opacity=".75"><circle cx="124" cy="113" r="3"/><circle cx="290" cy="183" r="2"/><circle cx="475" cy="78" r="3"/><circle cx="710" cy="135" r="2"/><circle cx="1122" cy="91" r="3"/></g>
+<path d="M0 455 130 316 234 428 370 270 520 438 670 300 812 435 978 285 1120 425 1280 320V800H0Z" fill="#584c83" opacity=".78"/>
+<path d="M0 520 150 408 280 495 435 375 570 505 735 390 900 505 1065 365 1280 500V800H0Z" fill="#3b416d"/>
+<g fill="#242f55">
+ <path d="M0 462h90v-170h70v170h62v-228h100v228h58v-150h95v150h60v-211h115v211h66v-128h85v128h60v-246h125v246h70v-165h88v165h77v-222h112v222h55v338H0Z"/>
+</g>
+<g opacity=".48" fill="url(#windows)">
+ <path d="M90 292h70v170H90zM222 234h100v228H222zM380 312h95v150h-95zM535 251h115v211H535zM716 334h85v128h-85zM861 216h125v246H861zM1056 297h88v165h-88zM1195 240h112v222h-112z"/>
+</g>
+<path d="M0 572q180-95 360 0t360 0 360 0 360 0V800H0Z" fill="url(#ground)"/>
+<path d="M0 632h1280" stroke="#456b8f" stroke-width="4" opacity=".65"/>
+<g stroke="#6ce8d7" stroke-width="3" opacity=".5"><path d="M90 690h100m40 0h55m-170 48h85m88 0h52m665-42h90m42 0h66"/></g>
+<!-- floating track -->
+<path d="M110 548 1030 548 1130 593 40 593Z" fill="#172b49"/><path d="M110 540 1030 540 1130 557 40 557Z" fill="url(#rail)" stroke="#c2ffe9" stroke-width="5"/>
+<path d="M130 565h870" stroke="#a8ffdf" stroke-width="5" stroke-dasharray="52 23" opacity=".72"/>
+<path d="M160 593v30m110-30v30m110-30v30m110-30v30m110-30v30m110-30v30m110-30v30m110-30v30" stroke="#182b49" stroke-width="16"/>
+<!-- runner shadow and energy trail -->
+<ellipse cx="575" cy="546" rx="70" ry="18" fill="#0b1429" opacity=".48"/>
+<path d="M443 390q-100 40-125 120M466 410q-75 50-96 110" stroke="#72e8e0" stroke-width="12" opacity=".45" filter="url(#soft)" fill="none"/>
+<!-- airborne stylized runner -->
+<g transform="translate(570 320) rotate(-15)">
+ <path d="M-18 90q-48 39-78 75l22 23q54-30 99-68Z" fill="#253653" stroke="#a3fff0" stroke-width="7"/>
+ <path d="M-79 181l-40 28 42 12 32-20Z" fill="#d0b9ff"/>
+ <path d="M23 87q48 22 78 69l-15 24q-62-23-103-66Z" fill="#1d2b49" stroke="#8fdfff" stroke-width="7"/>
+ <path d="M88 155l39 31-41 15-28-30Z" fill="#8e84d8"/>
+ <path d="M-34 4q38-31 75 1l28 91q-48 34-113 3l-10-62Z" fill="url(#suit)" stroke="#e9ffff" stroke-width="8"/>
+ <path d="M-20 25 30 30 53 80l-58 17-29-42Z" fill="#182c4a"/>
+ <path d="M-21 34 30 38" stroke="#a4fff0" stroke-width="9"/>
+ <path d="M-26 5q-3-39 29-55 36 3 46 37L37 31-12 27Z" fill="#202b4d" stroke="#c2b2ff" stroke-width="7"/>
+ <path d="M-15-11q20-18 49-2l8 21q-30 13-58-1Z" fill="#83ebef" stroke="#e1ffff" stroke-width="5"/>
+ <path d="M-14 22 25 27" stroke="#fff" stroke-width="4" opacity=".75"/>
+ <path d="M-59 20q-24 18-46 50l20 15q43-23 55-47Z" fill="#6d5b9f" stroke="#b4a5ff" stroke-width="7"/>
+ <path d="M-108 83l-22 25 26 10 25-22Z" fill="#9ae9ea"/>
+</g>
+<!-- barrier and orb -->
+<g transform="translate(870 454)"><rect x="-28" y="-63" width="56" height="63" rx="9" fill="#c44f89" stroke="#ffb4d3" stroke-width="5"/><path d="m-23-44 46-16M-23-20 22-38M-23 4 22-14" stroke="#ffd477" stroke-width="11"/><rect x="-36" y="-5" width="72" height="12" rx="5" fill="#243957"/></g>
+<g transform="translate(340 365)"><circle r="43" fill="#ffe08a" opacity=".24" filter="url(#glow)"/><path d="m0-28 18 28L0 28-18 0Z" fill="#ffe28d" stroke="#fff9d9" stroke-width="5"/><circle r="6" fill="#fff"/></g>
+<g transform="translate(64 55)"><rect width="250" height="42" rx="21" fill="#10172d" fill-opacity=".55" stroke="#b9d8fa" stroke-opacity=".3"/><circle cx="23" cy="21" r="6" fill="#8ef0c8"/><text x="42" y="27" fill="#edf6ff" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="3">NEON DASH</text></g>
+</svg>
