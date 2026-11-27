@@ -37,3 +37,7 @@ No application backend, database, or account system is required.
 - `games/neon-dash/` — Neon Dash, a 2D endless runner.
 - `games/starfall/` — Starfall, a 2D space shooter.
 - `games/neon-tracks-3d/` — Neon Tracks 3D, a 3D three-lane metro runner built with Three.js.
+
+## Game artwork
+
+Each game folder includes a `thumbnail.svg` illustration used by the homepage arcade card. Keep new game thumbnails in that folder and add the relative path as `thumbnail` in the `games` array in `index.html`.
