@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080c19">
+  <meta name="description" content="Play Neon Tracks 3D, the first 3D game from SuperGame. Sprint through a futuristic metro, dodge trains, jump barriers, slide under gates, and collect energy.">
+  <title>Neon Tracks 3D — SuperGame</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080c19;--text:#f4f7ff;--muted:#9ba8c3;--line:rgba(167,190,235,.15);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 58% -20%,rgba(104,80,206,.25),transparent 47rem),radial-gradient(ellipse at 3% 65%,rgba(44,163,175,.1),transparent 35rem),var(--bg)}
+    a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}
+    .page{width:min(1160px,calc(100% - 40px));margin:0 auto}
+    .topbar{height:72px;border-bottom:1px solid rgba(167,185,225,.1);background:rgba(8,12,25,.78);backdrop-filter:blur(16px)}
+    .topbar-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:inline-flex;align-items:center;gap:10px;font-size:18px;font-weight:850;letter-spacing:-.6px}
+    .brand-mark{width:37px;height:37px;display:grid;place-items:center;border:1px solid rgba(193,174,255,.42);border-radius:12px;color:white;background:linear-gradient(145deg,#a58aff,#6045d4);box-shadow:0 7px 23px rgba(118,86,224,.28),inset 0 1px rgba(255,255,255,.35)}
+    .brand-name span{color:#b8a4ff}
+    .crumb{display:flex;align-items:center;gap:9px;color:#9ba7c3;font-size:12px;font-weight:650}.crumb a:hover{color:#fff}.crumb-sep{color:#56627e}.crumb-current{color:#e5e9f8}
+    .back-link{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:11px;color:#c4cce0;background:rgba(255,255,255,.035);font-size:11px;font-weight:750;transition:background .18s ease,border-color .18s ease}
+    .back-link:hover{border-color:rgba(174,153,255,.35);background:rgba(255,255,255,.07)}
+    main{padding:38px 0 62px}
+    .intro{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:21px}
+    .eyebrow{display:flex;align-items:center;gap:8px;color:#a998ff;font-size:10px;font-weight:850;letter-spacing:1.8px;text-transform:uppercase}
+    .eyebrow-dot{width:7px;height:7px;border-radius:50%;background:#8ceacb;box-shadow:0 0 12px rgba(140,234,203,.8)}
+    h1{margin:10px 0 7px;font-size:clamp(34px,5vw,48px);font-weight:880;line-height:1.04;letter-spacing:-2.7px}
+    h1 span{color:transparent;background:linear-gradient(100deg,#bca7ff,#83d8ff 53%,#75e3df);background-clip:text;-webkit-background-clip:text}
+    .intro-copy{max-width:670px;margin:0;color:var(--muted);font-size:13px;line-height:1.75}
+    .game-number{flex:0 0 auto;padding:8px 11px;border:1px solid rgba(169,150,255,.2);border-radius:9px;color:#cbbdff;background:rgba(154,123,255,.08);font-size:10px;font-weight:850;letter-spacing:1px}
+    .game-frame{overflow:hidden;border:1px solid rgba(164,180,231,.19);border-radius:23px;background:rgba(13,19,35,.94);box-shadow:0 26px 80px rgba(0,0,0,.34),0 0 60px rgba(112,86,219,.09),inset 0 1px rgba(255,255,255,.07)}
+    .frame-top{min-height:53px;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 17px;border-bottom:1px solid rgba(163,181,230,.1);background:rgba(255,255,255,.018)}
+    .frame-label{display:flex;align-items:center;gap:9px;color:#9ba8c5;font-size:10px;font-weight:850;letter-spacing:1.35px}
+    .frame-label-mark{display:grid;width:24px;height:24px;place-items:center;border:1px solid rgba(181,160,255,.2);border-radius:8px;color:#bba9ff;background:rgba(154,123,255,.1)}
+    .frame-tools{display:flex;align-items:center;gap:8px}
+    .icon-button{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(162,180,224,.15);border-radius:10px;color:#c2cbe1;background:rgba(255,255,255,.035);cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+    .icon-button:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(174,153,255,.4);background:rgba(255,255,255,.08)}.icon-button:disabled{opacity:.35;cursor:not-allowed}
+    .canvas-wrap{position:relative;overflow:hidden;background:#080f21}
+    #gameCanvas{width:100%;height:auto;display:block;aspect-ratio:16/9;touch-action:none;outline:none}
+    .hud{position:absolute;z-index:2;top:15px;left:17px;right:17px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
+    .hud-group{display:flex;gap:8px}
+    .hud-card{min-width:88px;padding:8px 11px 7px;border:1px solid rgba(210,222,255,.15);border-radius:10px;background:rgba(7,13,28,.55);box-shadow:0 4px 18px rgba(0,0,0,.13);backdrop-filter:blur(9px)}
+    .hud-label{display:block;color:#9ba9c7;font-size:8px;font-weight:850;letter-spacing:1.3px;text-transform:uppercase}
+    .hud-value{display:block;margin-top:2px;color:#fff;font-size:20px;font-weight:850;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:-.7px}
+    .hud-right{text-align:right}
+    .lives{display:flex;gap:4px;margin-top:5px}
+    .life{width:12px;height:12px;color:#ff91b6;filter:drop-shadow(0 0 5px rgba(255,110,152,.55))}.life.lost{color:#46516c;filter:none}
+    .overlay{position:absolute;z-index:4;inset:0;display:grid;place-items:center;padding:20px;background:rgba(5,9,21,.38);backdrop-filter:blur(4px)}
+    .overlay[hidden]{display:none}
+    .overlay-panel{width:min(440px,100%);padding:27px 27px 24px;border:1px solid rgba(199,187,255,.25);border-radius:20px;background:linear-gradient(145deg,rgba(23,28,55,.97),rgba(11,25,42,.97));box-shadow:0 20px 80px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.08);text-align:center}
+    .overlay-kicker{margin:0 0 9px;color:#b5a1ff;font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+    .overlay-panel h2{margin:0;font-size:clamp(26px,4vw,35px);line-height:1.05;letter-spacing:-1.5px}
+    .overlay-panel h2 span{color:transparent;background:linear-gradient(100deg,#beaaff,#74e7df);background-clip:text;-webkit-background-clip:text}
+    .overlay-description{max-width:355px;margin:12px auto 18px;color:#aeb8d1;font-size:12px;line-height:1.7}
+    .control-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-bottom:19px}
+    .control-pill{padding:6px 9px;border:1px solid rgba(171,188,230,.15);border-radius:7px;color:#bec8df;background:rgba(255,255,255,.035);font-size:9px;font-weight:750}
+    .action-button{min-height:45px;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:0 19px;border:0;border-radius:12px;color:#101425;background:linear-gradient(105deg,#b9a4ff,#8cdbdf);box-shadow:0 8px 27px rgba(137,119,235,.23),inset 0 1px rgba(255,255,255,.65);font-size:12px;font-weight:900;cursor:pointer;transition:transform .17s ease,box-shadow .17s ease,filter .17s ease}
+    .action-button:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(137,119,235,.32);filter:brightness(1.05)}
+    .action-button.secondary{border:1px solid rgba(173,187,225,.2);color:#e2e8fa;background:rgba(255,255,255,.07);box-shadow:none}
+    .action-row{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:19px}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0 3px}
+    .result-stat{padding:11px 10px;border:1px solid rgba(169,185,229,.13);border-radius:11px;background:rgba(255,255,255,.035)}
+    .result-stat span{display:block;color:#9ba8c6;font-size:8px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase}
+    .result-stat strong{display:block;margin-top:4px;font-size:22px;font-weight:850;font-variant-numeric:tabular-nums}
+    .new-best{display:inline-block;margin-top:10px;padding:5px 9px;border:1px solid rgba(139,239,192,.2);border-radius:7px;color:#a5f3cd;background:rgba(90,195,143,.09);font-size:9px;font-weight:850;letter-spacing:.9px}
+    .game-controls{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 17px;border-top:1px solid rgba(163,181,230,.1);background:rgba(255,255,255,.015)}
+    .controls-copy{display:flex;align-items:center;flex-wrap:wrap;gap:15px;color:#9ba7bf;font-size:10px}
+    .control-hint{display:inline-flex;align-items:center;gap:7px}
+    kbd{display:inline-grid;min-width:21px;height:21px;place-items:center;padding:0 5px;border:1px solid rgba(181,195,231,.2);border-bottom-width:2px;border-radius:5px;color:#d8e0f5;background:rgba(255,255,255,.045);font-family:inherit;font-size:9px;font-weight:850}
+    .mobile-controls{display:none;align-items:center;gap:7px}
+    .mobile-button{min-width:43px;height:38px;display:grid;place-items:center;padding:0 9px;border:1px solid rgba(173,153,255,.24);border-radius:10px;color:#e0d9ff;background:rgba(154,123,255,.12);font-size:9px;font-weight:850;touch-action:none;user-select:none}
+    .mobile-button:active{background:rgba(154,123,255,.32)}
+    .below-game{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:17px}
+    .info-card{padding:18px 19px;border:1px solid var(--line);border-radius:15px;background:rgba(16,23,41,.62)}
+    .info-title{display:flex;align-items:center;gap:8px;margin:0 0 8px;color:#eef1ff;font-size:12px;font-weight:850}.info-title svg{color:#b5a2ff}
+    .info-card p{margin:0;color:#9ca8c1;font-size:11px;line-height:1.75}
+    .tip-row{display:flex;align-items:flex-start;gap:8px;margin-top:8px;color:#aeb9d0;font-size:10px;line-height:1.6}.tip-row:first-of-type{margin-top:0}
+    .tip-dot{width:5px;height:5px;flex:0 0 auto;margin-top:5px;border-radius:50%;background:#78e4d8;box-shadow:0 0 8px rgba(120,228,216,.6)}
+    .webgl-error{padding:35px 20px;text-align:center;color:#cad3e9;font-size:13px;line-height:1.7}
+    footer{padding:24px 0 30px;border-top:1px solid rgba(167,185,225,.09);color:#74819e;font-size:10px}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}.footer-inner a:hover{color:#dce3f8}
+    @media(max-width:720px){
+      .page{width:min(100% - 28px,1160px)}.topbar{height:64px}.crumb{display:none}main{padding-top:30px}
+      .intro{align-items:flex-start}.intro-copy{font-size:12px}.game-frame{border-radius:17px}.frame-top{min-height:47px;padding-inline:12px}
+      .hud{top:10px;left:10px;right:10px}.hud-card{min-width:71px;padding:6px 8px;border-radius:9px}.hud-value{font-size:17px}
+      .overlay-panel{padding:22px 18px 20px}.game-controls{padding:10px 12px}.controls-copy{gap:9px;font-size:9px}.mobile-controls{display:flex}
+      .below-game{grid-template-columns:1fr}
+    }
+    @media(max-width:460px){
+      .page{width:calc(100% - 22px)}.brand{font-size:16px}.brand-mark{width:34px;height:34px}.back-link{padding:8px 9px;font-size:10px}
+      main{padding-top:24px}.intro{gap:9px;flex-direction:column;margin-bottom:15px}h1{font-size:38px}.game-number{margin:0}
+      .hud-card{min-width:60px;padding:5px 6px}.hud-label{font-size:7px}.hud-value{font-size:15px}.hud-group{gap:5px}
+      .lives{gap:2px}.life{width:9px;height:9px}.overlay{padding:10px}.overlay-panel{padding:18px 14px 16px}
+      .overlay-description{margin:9px auto 13px;font-size:11px}.control-pills{margin-bottom:14px}
+      .game-controls{align-items:flex-start}.controls-copy{max-width:180px;align-items:flex-start;flex-direction:column}.mobile-button{min-width:36px;padding-inline:7px;height:36px}
+      .footer-inner{align-items:flex-start;flex-direction:column}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="page topbar-inner">
+    <a class="brand" href="../../" aria-label="SuperGame home"><span class="brand-mark" aria-hidden="true">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="m12 2 2.2 6.1 6.5.6-5 4.2 1.5 6.3-5.2-3.4-5.2 3.4 1.5-6.3-5-4.2 6.5-.6L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 7v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </span><span class="brand-name">Super<span>Game</span></span></a>
+    <div class="crumb"><a href="../../">Home</a><span class="crumb-sep">/</span><span class="crumb-current">Neon Tracks 3D</span></div>
+    <a class="back-link" href="../../"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back to arcade</a>
+  </div></header>
+
+  <main class="page">
+    <section class="intro">
+      <div><div class="eyebrow"><span class="eyebrow-dot"></span> SuperGame original · Game 003 · First 3D game</div>
+        <h1>NEON <span>TRACKS 3D</span></h1>
+        <p class="intro-copy">The metro never sleeps. Sprint through a glowing futuristic city, switch tracks to dodge oncoming trains, leap over barriers, slide beneath gates, and scoop up energy along the way.</p>
+      </div>
+      <div class="game-number">3D ENDLESS RUNNER</div>
+    </section>
+
+    <section class="game-frame" aria-label="Neon Tracks 3D game">
+      <div class="frame-top">
+        <div class="frame-label"><span class="frame-label-mark" aria-hidden="true">✦</span> NEON METRO <span style="color:#5c6987">/</span> LINE 03</div>
+        <div class="frame-tools">
+          <button class="icon-button" id="soundButton" type="button" aria-label="Turn sound off" title="Toggle sound">
+            <svg id="soundIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10v4h3l4 3V7l-4 3H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M15 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-button" id="pauseButton" type="button" aria-label="Pause game" title="Pause game" disabled>
+            <svg id="pauseIcon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM15 5h4v14h-4z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="gameCanvas" width="960" height="540" tabindex="0" aria-label="Neon Tracks 3D game. Use left and right arrows to change lanes, up to jump, and down to slide."></canvas>
+        <div class="hud">
+          <div class="hud-group">
+            <div class="hud-card"><span class="hud-label">Score</span><strong class="hud-value" id="scoreValue">00000</strong></div>
+            <div class="hud-card"><span class="hud-label">Energy</span><strong class="hud-value" id="coinValue">0</strong></div>
+          </div>
+          <div class="hud-group">
+            <div class="hud-card hud-right"><span class="hud-label">Personal best</span><strong class="hud-value" id="bestValue">00000</strong></div>
+            <div class="hud-card"><span class="hud-label">Hull</span><div class="lives" id="livesValue" aria-label="3 lives remaining"></div></div>
+          </div>
+        </div>
+
+        <div class="overlay" id="startOverlay"><div class="overlay-panel">
+          <p class="overlay-kicker">A new dimension of SuperGame</p>
+          <h2>RUN THE <span>METRO.</span></h2>
+          <p class="overlay-description">Three lanes. One very busy metro. Dodge trains, jump barriers, slide under gates, and collect energy orbs. How long can you keep running?</p>
+          <div class="control-pills"><span class="control-pill">← → CHANGE LANES</span><span class="control-pill">↑ JUMP</span><span class="control-pill">↓ SLIDE</span></div>
+          <button class="action-button" id="startButton" type="button">Start running <span aria-hidden="true">→</span></button>
+        </div></div>
+        <div class="overlay" id="pauseOverlay" hidden><div class="overlay-panel">
+          <p class="overlay-kicker">Take a breather</p><h2>RUN <span>PAUSED</span></h2>
+          <p class="overlay-description">The metro can wait. Your run is right where you left it.</p>
+          <button class="action-button" id="resumeButton" type="button">Resume run <span aria-hidden="true">→</span></button>
+        </div></div>
+        <div class="overlay" id="gameOverOverlay" hidden><div class="overlay-panel">
+          <p class="overlay-kicker">End of the line</p><h2>RUN <span>COMPLETE.</span></h2>
+          <p class="overlay-description" id="gameOverCopy">The metro got the best of you this time. Ready for another run?</p>
+          <div class="result-grid">
+            <div class="result-stat"><span>Your score</span><strong id="finalScore">0</strong></div>
+            <div class="result-stat"><span>Energy collected</span><strong id="finalCoins">0</strong></div>
+          </div>
+          <div id="newBestBadge" class="new-best" hidden>✦ NEW PERSONAL BEST</div>
+          <div class="action-row"><button class="action-button" id="playAgainButton" type="button">Run it back <span aria-hidden="true">↻</span></button><a class="action-button secondary" href="../../">Arcade home</a></div>
+        </div></div>
+      </div>
+
+      <div class="game-controls">
+        <div class="controls-copy">
+          <span class="control-hint"><kbd>←</kbd> <kbd>→</kbd> Change lanes</span>
+          <span class="control-hint"><kbd>↑</kbd> Jump</span>
+          <span class="control-hint"><kbd>↓</kbd> Slide</span>
+          <span class="control-hint"><kbd>P</kbd> Pause</span>
+        </div>
+        <div class="mobile-controls" aria-label="Touch game controls">
+          <button class="mobile-button" id="leftButton" type="button" aria-label="Move left">◀</button>
+          <button class="mobile-button" id="jumpButton" type="button">JUMP</button>
+          <button class="mobile-button" id="slideButton" type="button">SLIDE</button>
+          <button class="mobile-button" id="rightButton" type="button" aria-label="Move right">▶</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="below-game">
+      <article class="info-card"><h2 class="info-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18m-6-6 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>How to play</h2>
+        <p>Stay on the move across three tracks. Switch lanes to avoid trains, jump over low barriers, and slide under overhead gates. You have three hull points, so try not to take too many hits.</p>
+      </article>
+      <article class="info-card"><h2 class="info-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 2.4 5.1 5.6.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.6-.8L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>Runner tips</h2>
+        <div class="tip-row"><span class="tip-dot"></span><span>Trains block an entire lane. Barriers need a jump; low overhead gates need a slide.</span></div>
+        <div class="tip-row"><span class="tip-dot"></span><span>Collect glowing energy orbs for bonus points. The metro speeds up the longer you survive.</span></div>
+      </article>
+    </section>
+  </main>
+  <footer><div class="page footer-inner"><span>© <span id="year">2026</span> SuperGame · Made for fun.</span><a href="../../">Back to the SuperGame arcade ↗</a></div></footer>
+
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+    (function () {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      const canvas = $("gameCanvas");
+      const wrap = $("canvasWrap");
+      const W = 960, H = 540;
+      const laneX = [-2.35, 0, 2.35];
+      const playerZ = 5.5;
+      const bestKey = "supergame-neon-tracks-3d-best-v1";
+      const ui = {
+        score:$("scoreValue"), coins:$("coinValue"), best:$("bestValue"), lives:$("livesValue"),
+        start:$("startOverlay"), pause:$("pauseOverlay"), over:$("gameOverOverlay"),
+        pauseButton:$("pauseButton"), pauseIcon:$("pauseIcon"), soundButton:$("soundButton"), soundIcon:$("soundIcon"),
+        finalScore:$("finalScore"), finalCoins:$("finalCoins"), newBest:$("newBestBadge"), gameOverCopy:$("gameOverCopy")
+      };
+
+      let renderer, scene, camera, clock;
+      let state = "ready", score = 0, coins = 0, best = loadBest(), lives = 3;
+      let elapsed = 0, speed = 19, lane = 1, laneCooldown = 0, jumpVelocity = 0, jumpY = 0, slideTime = 0, hitCooldown = 0;
+      let spawnTimer = 1.3, patternCount = 0, shake = 0, flash = 0, visualTime = 0;
+      let soundEnabled = true, audioContext = null, newBest = false;
+      let runner, runnerBody, leftArm, rightArm, leftLeg, rightLeg;
+      let railSleepers = [], streetLights = [], arches = [], buildings = [], scenery = [], obstacles = [], pickups = [], particles = [];
+      let swipeStart = null, pointerId = null;
+      const clockKeys = {left:false,right:false};
+
+      function loadBest(){try{return Number(localStorage.getItem(bestKey))||0;}catch(e){return 0;}}
+      function saveBest(v){try{localStorage.setItem(bestKey,String(v));}catch(e){}}
+      function format(v){return String(Math.floor(v)).padStart(5,"0");}
+      function makeMaterial(color,roughness,metalness,emissive,intensity){
+        return new THREE.MeshStandardMaterial({color:color,roughness:roughness===undefined?.55:roughness,metalness:metalness===undefined?.15:metalness,emissive:emissive||0x000000,emissiveIntensity:intensity===undefined?0:intensity});
+      }
+      function box(w,h,d,mat,x,y,z,parent){
+        const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;(parent||scene).add(mesh);return mesh;
+      }
+      function sphere(radius,mat,x,y,z,parent,scale){
+        const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,18,14),mat);mesh.position.set(x,y,z);if(scale)mesh.scale.set(scale[0],scale[1],scale[2]);mesh.castShadow=true;(parent||scene).add(mesh);return mesh;
+      }
+      function cylinder(rt,rb,h,mat,x,y,z,parent,segments){
+        const mesh=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,segments||12),mat);mesh.position.set(x,y,z);mesh.castShadow=true;(parent||scene).add(mesh);return mesh;
+      }
+      const mats = {};
+      function makeMaterials(){
+        mats.floor=makeMaterial(0x10192e,.88,.28);
+        mats.floorLine=makeMaterial(0x4c638a,.55,.35,0x24406c,.35);
+        mats.rail=makeMaterial(0x9cacc4,.28,.85,0x203759,.25);
+        mats.sleeper=makeMaterial(0x293957,.82,.35);
+        mats.neon=makeMaterial(0x72e6df,.3,.45,0x42e0dc,2.2);
+        mats.purple=makeMaterial(0xa58aff,.3,.42,0x855eff,1.5);
+        mats.pink=makeMaterial(0xff729e,.38,.28,0xff3f85,1.2);
+        mats.yellow=makeMaterial(0xffd578,.34,.25,0xffa62b,.8);
+        mats.playerBody=makeMaterial(0x6fc9f1,.35,.38,0x2a83c5,.4);
+        mats.playerDark=makeMaterial(0x1a2948,.32,.4);
+        mats.playerLight=makeMaterial(0xbbaaff,.3,.25,0x9476ff,.7);
+        mats.glass=makeMaterial(0x1e4568,.22,.62,0x318dc2,.65);
+        mats.cityA=makeMaterial(0x111b33,.82,.28);
+        mats.cityB=makeMaterial(0x192544,.78,.32);
+        mats.cityGlass=makeMaterial(0x315b83,.3,.42,0x2f8bbd,.55);
+        mats.white=makeMaterial(0xe4f7ff,.32,.15,0x6dcbff,.7);
+      }
+
+      function initThree(){
+        renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:false,powerPreference:"high-performance"});
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
+        renderer.setSize(wrap.clientWidth,wrap.clientWidth*9/16,false);
+        renderer.outputColorSpace=THREE.SRGBColorSpace;
+        renderer.toneMapping=THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure=1.17;
+        renderer.shadowMap.enabled=true;
+        renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+        scene=new THREE.Scene();
+        scene.background=new THREE.Color(0x080e20);
+        scene.fog=new THREE.FogExp2(0x0a1329,.0125);
+        camera=new THREE.PerspectiveCamera(61,16/9,.1,220);
+        camera.position.set(0,7.3,14.3);
+        camera.lookAt(0,1.15,-12);
+        clock=new THREE.Clock();
+
+        scene.add(new THREE.HemisphereLight(0x9acaff,0x12142c,1.6));
+        const keyLight=new THREE.DirectionalLight(0xd8e8ff,2.0);keyLight.position.set(-5,12,7);keyLight.castShadow=true;keyLight.shadow.mapSize.set(1024,1024);keyLight.shadow.camera.left=-13;keyLight.shadow.camera.right=13;keyLight.shadow.camera.top=18;keyLight.shadow.camera.bottom=-12;scene.add(keyLight);
+        const cyanLight=new THREE.PointLight(0x35dede,28,42,2);cyanLight.position.set(-5,5,-12);scene.add(cyanLight);
+        const violetLight=new THREE.PointLight(0x875cff,27,46,2);violetLight.position.set(5,5,-28);scene.add(violetLight);
+        makeMaterials();buildWorld();createRunner();resize();
+        window.addEventListener("resize",resize);
+        if(window.ResizeObserver){new ResizeObserver(resize).observe(wrap);}
+      }
+
+      function resize(){
+        if(!renderer)return;
+        const width=Math.max(320,wrap.clientWidth);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
+        renderer.setSize(width,width*9/16,false);
+        camera.aspect=16/9;camera.updateProjectionMatrix();
+      }
+
+      function buildWorld(){
+        const floor=new THREE.Mesh(new THREE.PlaneGeometry(13,190),mats.floor);floor.rotation.x=-Math.PI/2;floor.position.set(0,-.18,-62);floor.receiveShadow=true;scene.add(floor);
+        const sideFloorMat=makeMaterial(0x0b1427,.9,.2);
+        for(const side of [-1,1]){
+          const sideFloor=new THREE.Mesh(new THREE.PlaneGeometry(16,190),sideFloorMat);sideFloor.rotation.x=-Math.PI/2;sideFloor.position.set(side*14,-.22,-62);scene.add(sideFloor);
+        }
+        for(let x=-3.55;x<=3.56;x+=2.37){
+          box(.15,.15,180,mats.rail,x,.02,-66);
+          box(.07,.08,180,mats.floorLine,x,.13,-66);
+        }
+        for(let z=-150;z<20;z+=2.4){
+          const sleeper=box(9.1,.16,.42,mats.sleeper,0,-.045,z);
+          railSleepers.push(sleeper);
+        }
+        for(let x of [-3.65,-1.2,1.2,3.65]){
+          box(.045,.012,180,mats.neon,x,.015,-66);
+        }
+        for(let z=-150;z<10;z+=22){
+          const g=new THREE.Group();g.position.z=z;scene.add(g);
+          for(const x of [-5.3,5.3]){
+            box(.28,7.4,.32,mats.cityB,x,3.55,0,g);
+            box(.42,.1,.48,mats.neon,x,6.95,0,g);
+            for(let y=1.2;y<6.6;y+=1.35)box(.055,.55,.35,mats.cityGlass,x+(x<0?.17:-.17),y,.18,g);
+          }
+          box(10.8,.35,.38,mats.cityB,0,7.2,0,g);
+          box(10.4,.065,.44,mats.purple,0,7.42,0,g);
+          arches.push(g);
+        }
+        for(let i=0;i<18;i++){
+          const z=-145+i*9;
+          for(const side of [-1,1])buildBuilding(side,z);
+        }
+        const starVertices=[];
+        for(let i=0;i<700;i++){
+          const x=(Math.random()-.5)*150,y=5+Math.random()*55,z=-Math.random()*170;
+          starVertices.push(x,y,z);
+        }
+        const starGeo=new THREE.BufferGeometry();starGeo.setAttribute("position",new THREE.Float32BufferAttribute(starVertices,3));
+        const starMat=new THREE.PointsMaterial({color:0xc7dcff,size:.17,transparent:true,opacity:.74,sizeAttenuation:true});
+        scene.add(new THREE.Points(starGeo,starMat));
+        for(let z=-145;z<15;z+=18){
+          const l=new THREE.Group();l.position.z=z;scene.add(l);
+          for(const side of [-1,1]){
+            const post=cylinder(.055,.08,3.1,mats.cityB,side*5.7,4.15,0,l);
+            const lamp=box(.55,.08,.22,mats.neon,side*5.7,5.68,0,l);
+            const light=new THREE.PointLight(side<0?0x56d9ed:0xa080ff,7,14,2);light.position.set(side*5.5,5.2,0);l.add(light);
+          }
+          streetLights.push(l);
+        }
+      }
+
+      function buildBuilding(side,z){
+        const group=new THREE.Group();group.position.set(side*(8.1+Math.random()*3.8),0,z);scene.add(group);
+        const width=2.5+Math.random()*2.8,height=6+Math.random()*16,depth=5+Math.random()*4;
+        const body=new THREE.Mesh(new THREE.BoxGeometry(width,height,depth),Math.random()>.5?mats.cityA:mats.cityB);body.position.y=height/2-0.2;body.castShadow=true;body.receiveShadow=true;group.add(body);
+        const trimMat=Math.random()>.5?mats.neon:mats.purple;
+        const trim=box(width+.05,.08,depth+.06,trimMat,0,height/2+.1,0,group);
+        for(let y=1.1;y<height-1.2;y+=1.65){
+          for(let x=-width/2+.48;x<width/2-.2;x+=.78){
+            const win=box(.33,.58,.055,Math.random()>.73?mats.purple:mats.cityGlass,x,y,depth/2+.03,group);
+            win.material=win.material.clone();
+            win.material.emissiveIntensity=.25+Math.random()*.55;
+          }
+        }
+        const sign=box(width*.72,.32,.12,trimMat,0,height*.68,depth/2+.1,group);
+        sign.material=sign.material.clone();sign.material.emissiveIntensity=1.8;
+        buildings.push({group,side});
+      }
+
+      function createRunner(){
+        runner=new THREE.Group();runner.position.set(laneX[lane],0,playerZ);scene.add(runner);
+        runnerBody=new THREE.Group();runner.add(runnerBody);
+        const bodyGeo=new THREE.CapsuleGeometry(.34,.66,5,10);
+        const torso=new THREE.Mesh(bodyGeo,mats.playerBody);torso.position.y=1.22;torso.castShadow=true;runnerBody.add(torso);
+        const chest=new THREE.Mesh(new THREE.BoxGeometry(.42,.22,.1),mats.playerLight);chest.position.set(0,1.38,.31);runnerBody.add(chest);
+        const head=new THREE.Mesh(new THREE.SphereGeometry(.32,24,18),mats.playerLight);head.position.set(0,1.88,0);head.castShadow=true;runnerBody.add(head);
+        const helmet=new THREE.Mesh(new THREE.SphereGeometry(.34,24,14,0,Math.PI*2,0,Math.PI*.58),mats.playerDark);helmet.position.set(0,1.94,0);runnerBody.add(helmet);
+        const visor=new THREE.Mesh(new THREE.SphereGeometry(.22,20,12),mats.glass);visor.scale.set(1.28,.48,.45);visor.position.set(0,1.88,.265);runnerBody.add(visor);
+        const visorLine=box(.31,.035,.025,mats.neon,0,1.88,.37,runnerBody);
+        const pack=box(.5,.63,.25,mats.playerDark,0,1.25,-.36,runnerBody);
+        box(.34,.08,.29,mats.purple,0,1.45,-.52,runnerBody);
+        const armGeo=new THREE.CapsuleGeometry(.115,.5,4,8);
+        leftArm=new THREE.Group();leftArm.position.set(-.42,1.45,0);runnerBody.add(leftArm);
+        const la=new THREE.Mesh(armGeo,mats.playerLight);la.position.y=-.31;la.castShadow=true;leftArm.add(la);
+        rightArm=new THREE.Group();rightArm.position.set(.42,1.45,0);runnerBody.add(rightArm);
+        const ra=new THREE.Mesh(armGeo,mats.playerLight);ra.position.y=-.31;ra.castShadow=true;rightArm.add(ra);
+        const legGeo=new THREE.CapsuleGeometry(.145,.52,4,8);
+        leftLeg=new THREE.Group();leftLeg.position.set(-.2,.82,0);runnerBody.add(leftLeg);
+        const ll=new THREE.Mesh(legGeo,mats.playerDark);ll.position.y=-.3;ll.castShadow=true;leftLeg.add(ll);
+        box(.34,.18,.48,mats.neon,0,-.61,.09,leftLeg);
+        rightLeg=new THREE.Group();rightLeg.position.set(.2,.82,0);runnerBody.add(rightLeg);
+        const rl=new THREE.Mesh(legGeo,mats.playerDark);rl.position.y=-.3;rl.castShadow=true;rightLeg.add(rl);
+        box(.34,.18,.48,mats.purple,0,-.61,.09,rightLeg);
+        const glow=new THREE.PointLight(0x61e8ea,2.2,4,2);glow.position.set(0,.7,0);runner.add(glow);
+      }
+
+      function createTrain(){
+        const group=new THREE.Group();
+        const bodyMat=makeMaterial(0x203957,.28,.66,0x174b6a,.45);
+        const body=box(2.08,3.28,5.8,bodyMat,0,1.68,0,group);
+        box(2.12,.16,5.86,mats.neon,0,3.32,0,group);
+        box(1.9,.11,5.5,mats.playerDark,0,3.39,-.08,group);
+        const front=box(1.72,1.55,.1,mats.cityGlass,0,2.15,2.96,group);
+        front.material=front.material.clone();front.material.emissive.setHex(0x1f8bb4);front.material.emissiveIntensity=.75;
+        box(1.58,.08,.12,mats.neon,0,1.35,3.03,group);
+        for(const x of [-.72,.72]){
+          box(.24,.16,.1,mats.yellow,x,.65,3.02,group);
+          box(.18,.22,.1,mats.white,x,2.98,3.02,group);
+          const strip=box(.075,1.05,.13,mats.purple,x,2.06,3.02,group);
+        }
+        for(const side of [-1,1]){
+          for(let z=-2;z<=2;z+=1.2){
+            const window=box(.035,.86,.78,mats.glass,side*1.055,2.35,z,group);
+          }
+          box(.06,.1,5.2,mats.purple,side*1.07,1.05,0,group);
+        }
+        group.userData={kind:"train"};
+        return group;
+      }
+
+      function createBarrier(){
+        const g=new THREE.Group();
+        box(1.88,.98,.35,mats.pink,0,.66,0,g);
+        box(1.98,.12,.43,mats.yellow,0,1.18,0,g);
+        for(let x=-.72;x<=.73;x+=.48){
+          const stripe=box(.17,.8,.04,mats.yellow,x,.66,.2,g);stripe.rotation.z=-.4;
+        }
+        for(const x of [-.77,.77]){
+          box(.13,.28,.16,mats.playerDark,x,.16,0,g);
+          box(.16,.08,.2,mats.white,x,.31,0,g);
+        }
+        g.userData={kind:"barrier"};return g;
+      }
+
+      function createGate(){
+        const g=new THREE.Group();
+        for(const x of [-.92,.92]){
+          box(.13,2.55,.18,mats.playerDark,x,1.28,0,g);
+          box(.2,.11,.24,mats.neon,x,2.47,0,g);
+        }
+        box(2.05,.24,.28,mats.pink,0,2.25,0,g);
+        box(1.94,.055,.31,mats.yellow,0,2.25,.015,g);
+        box(.3,.1,.3,mats.purple,0,2.49,0,g);
+        g.userData={kind:"gate"};return g;
+      }
+
+      function createObstacle(type,laneIndex,z){
+        const g=type==="train"?createTrain():type==="barrier"?createBarrier():createGate();
+        g.position.set(laneX[laneIndex],0,z);scene.add(g);
+        obstacles.push({mesh:g,type,lane:laneIndex,checked:false});
+      }
+
+      function createCoin(laneIndex,z,y){
+        const group=new THREE.Group();group.position.set(laneX[laneIndex],y,z);
+        const ring=new THREE.Mesh(new THREE.TorusGeometry(.34,.105,9,20),mats.yellow);ring.rotation.y=Math.PI/2;ring.castShadow=true;group.add(ring);
+        const center=new THREE.Mesh(new THREE.OctahedronGeometry(.17,0),mats.white);group.add(center);
+        const halo=new THREE.Mesh(new THREE.TorusGeometry(.47,.018,5,24),mats.neon);halo.rotation.y=Math.PI/2;group.add(halo);
+        scene.add(group);pickups.push({mesh:group,lane:laneIndex,kind:"coin",taken:false,baseY:y});
+      }
+
+      function createParticle(pos,color){
+        const mat=new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:1});
+        const mesh=new THREE.Mesh(new THREE.SphereGeometry(.065,7,6),mat);mesh.position.copy(pos);scene.add(mesh);
+        const dir=new THREE.Vector3((Math.random()-.5)*2,Math.random()*1.8,(Math.random()-.5)*1.8);
+        particles.push({mesh,velocity:dir.multiplyScalar(2+Math.random()*4),life:.45+Math.random()*.45,max:.9});
+      }
+
+      function burst(position,color,count){
+        for(let i=0;i<count;i++)createParticle(position,color);
+      }
+
+      function updateHud(){
+        ui.score.textContent=format(score);ui.coins.textContent=String(coins);ui.best.textContent=format(best);
+        ui.lives.innerHTML="";
+        for(let i=0;i<3;i++){
+          const s=document.createElementNS("http://www.w3.org/2000/svg","svg");
+          s.setAttribute("viewBox","0 0 20 20");s.setAttribute("class","life"+(i>=lives?" lost":""));s.setAttribute("aria-hidden","true");
+          const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("fill","currentColor");p.setAttribute("d","M10 17.1 3 10.4C-.5 6.5 5.4.1 10 4.8c4.6-4.7 10.5 1.7 7 5.6l-7 6.7Z");s.appendChild(p);ui.lives.appendChild(s);
+        }
+        ui.lives.setAttribute("aria-label",lives+" hull points remaining");
+      }
+
+      function showOverlay(name){
+        ui.start.hidden=name!=="start";ui.pause.hidden=name!=="pause";ui.over.hidden=name!=="over";
+      }
+      function updatePauseButton(){
+        const paused=state==="paused";ui.pauseButton.disabled=state==="ready"||state==="over";
+        ui.pauseButton.setAttribute("aria-label",paused?"Resume game":"Pause game");ui.pauseButton.title=paused?"Resume game":"Pause game";
+        ui.pauseIcon.innerHTML=paused?'<path d="m8 5 11 7-11 7V5Z"/>':'<path d="M7 5h4v14H7zM15 5h4v14h-4z"/>';
+      }
+      function updateSoundButton(){
+        ui.soundButton.setAttribute("aria-label",soundEnabled?"Turn sound off":"Turn sound on");
+        ui.soundIcon.innerHTML=soundEnabled?'<path d="M4 10v4h3l4 3V7l-4 3H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M15 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>':'<path d="M4 10v4h3l4 3V7l-4 3H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m16 9 5 6m0-6-5 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>';
+      }
+      function getAudio(){
+        if(!soundEnabled)return null;
+        try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;if(!audioContext)audioContext=new C();if(audioContext.state==="suspended")audioContext.resume();return audioContext;}catch(e){return null;}
+      }
+      function beep(f,d,type,vol,slide){
+        const a=getAudio();if(!a)return;
+        const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type=type||"sine";o.frequency.setValueAtTime(f,t);
+        if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(35,f*slide),t+d);
+        g.gain.setValueAtTime(vol||.04,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d);
+      }
+
+      function cleanupWorldObjects(){
+        for(const collection of [obstacles,pickups,particles]){
+          for(const item of collection){const obj=item.mesh||item;if(obj.parent)obj.parent.remove(obj);}
+          collection.length=0;
+        }
+      }
+      function resetGame(){
+        cleanupWorldObjects();score=0;coins=0;lives=3;elapsed=0;speed=19;lane=1;laneCooldown=0;jumpVelocity=0;jumpY=0;slideTime=0;hitCooldown=0;
+        spawnTimer=1.25;patternCount=0;shake=0;flash=0;newBest=false;runner.position.set(0,0,playerZ);runnerBody.scale.set(1,1,1);runnerBody.position.y=0;
+        state="running";showOverlay("");updatePauseButton();updateHud();getAudio();lastTime=performance.now();
+      }
+      function startGame(){resetGame();spawnPattern();spawnCoinsRow();}
+      function pauseGame(){
+        if(state==="running"){state="paused";showOverlay("pause");}
+        else if(state==="paused"){state="running";showOverlay("");lastTime=performance.now();getAudio();}
+        updatePauseButton();
+      }
+      function endGame(){
+        if(state!=="running")return;
+        state="over";shake=.38;flash=.65;newBest=score>best;
+        if(newBest){best=score;saveBest(best);}
+        ui.finalScore.textContent=String(Math.floor(score));ui.finalCoins.textContent=String(coins);ui.newBest.hidden=!newBest;
+        ui.gameOverCopy.textContent=newBest?"A new personal best! You own the Neon Metro now.":"The metro finally caught up. Ready to try another run?";
+        showOverlay("over");updatePauseButton();updateHud();
+      }
+      function hitPlayer(){
+        if(hitCooldown>0)return;
+        lives--;hitCooldown=1.7;shake=.26;flash=.55;beep(175,.24,"sawtooth",.05,.4);
+        burst(runner.position.clone().add(new THREE.Vector3(0,1,0)),0xff82ad,18);
+        if(lives<=0)endGame();updateHud();
+      }
+
+      function spawnCoinsRow(){
+        const laneIndex=Math.floor(Math.random()*3),baseZ=-79-Math.random()*8;
+        const count=5+Math.floor(Math.random()*3);
+        for(let i=0;i<count;i++){
+          const y=i%3===1?2.05:1.15;
+          createCoin(laneIndex,baseZ-i*2.45,y);
+        }
+      }
+      function spawnPattern(){
+        patternCount++;
+        const first=Math.floor(Math.random()*3);
+        const roll=Math.random();
+        if(roll<.16){
+          const type=Math.random()<.56?"barrier":"gate";
+          createObstacle(type,first,-82);
+          const coinLane=(first+1+Math.floor(Math.random()*2))%3;
+          for(let i=0;i<6;i++)createCoin(coinLane,-72-i*2.25,1.15+(i%2)*.4);
+        }else if(roll<.35){
+          const safe=(first+1+Math.floor(Math.random()*2))%3;
+          const other=3-first-safe;
+          createObstacle(Math.random()<.55?"train":"barrier",first,-82);
+          createObstacle(Math.random()<.5?"barrier":"gate",other,-82);
+          for(let i=0;i<5;i++)createCoin(safe,-70-i*2.5,1.25);
+        }else{
+          const typeRoll=Math.random();
+          const type=typeRoll<.44?"train":typeRoll<.73?"barrier":"gate";
+          createObstacle(type,first,-82);
+          const coinLane=(first+1+Math.floor(Math.random()*2))%3;
+          for(let i=0;i<5;i++)createCoin(coinLane,-70-i*2.6,1.1+(i%2)*.65);
+        }
+      }
+
+      function changeLane(dir){
+        if(state!=="running"||laneCooldown>0)return;
+        const next=Math.max(0,Math.min(2,lane+dir));if(next===lane)return;
+        lane=next;laneCooldown=.14;beep(320,.07,"triangle",.018,1.3);
+      }
+      function jump(){
+        if(state!=="running"||jumpY>0.04||slideTime>0)return;
+        jumpVelocity=10.8;beep(390,.15,"triangle",.035,1.5);
+        burst(runner.position.clone().add(new THREE.Vector3(0,.2,.25)),0x76e8e0,5);
+      }
+      function slide(){
+        if(state!=="running"||jumpY>.08)return;
+        slideTime=.72;beep(245,.11,"triangle",.022,.7);
+      }
+      function handleInput(code){
+        if(state==="ready"||state==="over"){resetGame();spawnPattern();spawnCoinsRow();return;}
+        if(code==="left")changeLane(-1);
+        if(code==="right")changeLane(1);
+        if(code==="jump")jump();
+        if(code==="slide")slide();
+      }
+
+      function updateRunner(dt){
+        laneCooldown=Math.max(0,laneCooldown-dt);
+        const target=laneX[lane];
+        runner.position.x+=(target-runner.position.x)*Math.min(1,dt*13);
+        jumpY+=jumpVelocity*dt;
+        if(jumpY<0){jumpY=0;jumpVelocity=0;}else jumpVelocity-=27*dt;
+        slideTime=Math.max(0,slideTime-dt);
+        hitCooldown=Math.max(0,hitCooldown-dt);
+        runner.position.y=jumpY;
+        const sliding=slideTime>0;
+        runnerBody.scale.y+=(sliding?.54:1-runnerBody.scale.y)*Math.min(1,dt*14);
+        runnerBody.position.y=sliding?-.12:0;
+        const running=jumpY<.05;
+        const gait=visualTime*13;
+        leftArm.rotation.x=running?Math.sin(gait)*.72:(jumpY>0?-.85:0);
+        rightArm.rotation.x=running?Math.sin(gait+Math.PI)*.72:(jumpY>0?-.85:0);
+        leftLeg.rotation.x=running?Math.sin(gait+Math.PI)*.66:jumpY>0?-.32:0;
+        rightLeg.rotation.x=running?Math.sin(gait)*.66:jumpY>0?.32:0;
+        runner.rotation.z+=(Math.max(-.16,Math.min(.16,(target-runner.position.x)*-.07))-runner.rotation.z)*Math.min(1,dt*8);
+      }
+
+      function updateWorld(dt){
+        for(const s of railSleepers){s.position.z+=speed*dt;if(s.position.z>13)s.position.z-=168;}
+        for(const a of arches){a.position.z+=speed*dt;if(a.position.z>15)a.position.z-=176;}
+        for(const l of streetLights){l.position.z+=speed*dt;if(l.position.z>17)l.position.z-=162;}
+        for(const b of buildings){b.group.position.z+=speed*.72*dt;if(b.group.position.z>22)b.group.position.z-=168;}
+      }
+
+      function updateObjects(dt){
+        for(let i=obstacles.length-1;i>=0;i--){
+          const o=obstacles[i];o.mesh.position.z+=speed*dt;
+          if(!o.checked&&o.mesh.position.z>playerZ-1.05){
+            o.checked=true;
+            const sameLane=Math.abs(runner.position.x-laneX[o.lane])<.92;
+            if(sameLane&&Math.abs(o.mesh.position.z-playerZ)<1.55){
+              let safe=false;
+              if(o.type==="barrier")safe=jumpY>1.2;
+              else if(o.type==="gate")safe=slideTime>.12;
+              if(!safe)hitPlayer();
+            }
+          }
+          if(o.mesh.position.z>17){scene.remove(o.mesh);obstacles.splice(i,1);}
+        }
+        for(let i=pickups.length-1;i>=0;i--){
+          const p=pickups[i];p.mesh.position.z+=speed*dt;p.mesh.rotation.y+=dt*2.5;p.mesh.rotation.x+=dt*.9;
+          if(!p.taken&&Math.abs(p.mesh.position.z-playerZ)<1.3&&Math.abs(runner.position.x-p.mesh.position.x)<1.08&&Math.abs((jumpY+1.05)-p.mesh.position.y)<1.65){
+            p.taken=true;coins++;score+=45;beep(720,.1,"sine",.035,1.6);burst(p.mesh.position.clone(),0xffdf83,8);
+            scene.remove(p.mesh);pickups.splice(i,1);updateHud();continue;
+          }
+          if(p.mesh.position.z>17){scene.remove(p.mesh);pickups.splice(i,1);}
+        }
+        for(let i=particles.length-1;i>=0;i--){
+          const p=particles[i];p.mesh.position.addScaledVector(p.velocity,dt);p.velocity.y-=4*dt;p.life-=dt;p.mesh.material.opacity=Math.max(0,p.life/p.max);
+          if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();particles.splice(i,1);}
+        }
+      }
+
+      function update(dt){
+        elapsed+=dt;speed=Math.min(34,19+elapsed*.34);score+=dt*(11+speed*.42);
+        updateRunner(dt);updateWorld(dt);updateObjects(dt);
+        spawnTimer-=dt;
+        if(spawnTimer<=0){
+          spawnPattern();
+          spawnTimer=Math.max(1.12,1.68-elapsed*.008)+Math.random()*.32;
+        }
+        shake=Math.max(0,shake-dt*.8);flash=Math.max(0,flash-dt*1.7);
+        updateHud();
+      }
+
+      function render(){
+        if(!renderer)return;
+        const dt=Math.min(.04,clock.getDelta());
+        visualTime+=dt;
+        if(state==="running")update(dt);
+        else{
+          shake=Math.max(0,shake-dt*.8);flash=Math.max(0,flash-dt*1.7);
+          if(runner&&state==="ready")runner.position.y=Math.sin(visualTime*2)*.025;
+        }
+        const baseX=0;
+        camera.position.x+=(baseX-camera.position.x)*Math.min(1,dt*2.8);
+        camera.position.y=7.25+Math.sin(visualTime*.42)*.05;
+        camera.lookAt(0,1.1,-12);
+        if(shake>0)camera.position.x+=(Math.random()-.5)*shake;
+        renderer.render(scene,camera);
+        requestAnimationFrame(render);
+      }
+
+      function pause(){
+        if(state==="running"){state="paused";showOverlay("pause");}
+        else if(state==="paused"){state="running";showOverlay("");clock.getDelta();}
+        updatePauseButton();
+      }
+      function toggleSound(){
+        soundEnabled=!soundEnabled;updateSoundButton();if(soundEnabled)beep(560,.1,"sine",.025,1.3);
+      }
+      function bindButton(id,action){
+        $(id).addEventListener("pointerdown",e=>{e.preventDefault();handleInput(action);});
+        $(id).addEventListener("click",e=>{if(e.detail===0)handleInput(action);});
+      }
+
+      $("startButton").addEventListener("click",startGame);
+      $("playAgainButton").addEventListener("click",startGame);
+      $("resumeButton").addEventListener("click",pause);
+      ui.pauseButton.addEventListener("click",pause);
+      ui.soundButton.addEventListener("click",toggleSound);
+      bindButton("leftButton","left");bindButton("rightButton","right");bindButton("jumpButton","jump");bindButton("slideButton","slide");
+
+      window.addEventListener("keydown",e=>{
+        const code=e.code;
+        if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Space"].includes(code))e.preventDefault();
+        if(e.repeat)return;
+        if(code==="ArrowLeft"||code==="KeyA")handleInput("left");
+        else if(code==="ArrowRight"||code==="KeyD")handleInput("right");
+        else if(code==="ArrowUp"||code==="KeyW"||code==="Space")handleInput("jump");
+        else if(code==="ArrowDown"||code==="KeyS")handleInput("slide");
+        else if((code==="KeyP"||code==="Escape")&&(state==="running"||state==="paused"))pause();
+        else if(code==="Enter"&&(state==="ready"||state==="over"))startGame();
+      });
+      canvas.addEventListener("pointerdown",e=>{
+        if(e.pointerType==="touch"||e.pointerType==="pen"){swipeStart={x:e.clientX,y:e.clientY};pointerId=e.pointerId;canvas.setPointerCapture?.(e.pointerId);}
+      });
+      canvas.addEventListener("pointerup",e=>{
+        if(!swipeStart||e.pointerId!==pointerId)return;
+        const dx=e.clientX-swipeStart.x,dy=e.clientY-swipeStart.y;
+        if(Math.max(Math.abs(dx),Math.abs(dy))>24){
+          if(Math.abs(dx)>Math.abs(dy))handleInput(dx<0?"left":"right");
+          else handleInput(dy<0?"jump":"slide");
+        }
+        swipeStart=null;pointerId=null;
+      });
+      canvas.addEventListener("pointercancel",()=>{swipeStart=null;pointerId=null;});
+      window.addEventListener("blur",()=>{if(state==="running")pause();});
+      document.addEventListener("visibilitychange",()=>{if(document.hidden&&state==="running")pause();});
+      $("year").textContent=String(new Date().getFullYear());
+
+      try{
+        initThree();
+        updateHud();showOverlay("start");updatePauseButton();updateSoundButton();
+        resetGame();state="ready";showOverlay("start");updatePauseButton();
+        clock.start();requestAnimationFrame(render);
+      }catch(error){
+        console.error("Neon Tracks 3D could not initialize:",error);
+        wrap.innerHTML='<div class="webgl-error"><strong>3D graphics could not start.</strong><br>Try a browser with WebGL enabled, then refresh this page.</div>';
+      }
+    })();
+  </script>
+</body>
+</html>
