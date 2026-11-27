@@ -339,14 +339,23 @@
     .footer-links a { color: #929bb0; font-size: 11px; font-weight: 650; }
     .footer-links a:hover { color: #fff; }
 
-    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 17px; }
-    .game-card { overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); transition: transform .2s ease, border-color .2s ease; }
-    .game-card:hover { transform: translateY(-4px); border-color: rgba(173,153,255,.35); }
-    .game-card-art { display: grid; aspect-ratio: 16 / 10; place-items: center; background: linear-gradient(135deg, #55418e, #286c78); color: white; }
-    .game-card-art span { font-size: 42px; font-weight: 900; opacity: .85; }
-    .game-card-body { padding: 15px; }
-    .game-card h3 { margin: 0 0 5px; font-size: 15px; }
-    .game-card p { margin: 0; color: var(--muted); font-size: 12px; }
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 17px; }
+    .game-card { overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: linear-gradient(145deg, rgba(25,30,47,.96), rgba(17,21,34,.98)); transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+    .game-card:hover { transform: translateY(-4px); border-color: rgba(173,153,255,.38); box-shadow: 0 16px 38px rgba(0,0,0,.24), 0 0 28px rgba(130,112,224,.08); }
+    .game-card-art { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: #17213c; isolation: isolate; }
+    .game-card-art::after { position: absolute; inset: 35% 0 0; z-index: 1; content: ""; pointer-events: none; background: linear-gradient(180deg, transparent, rgba(6,10,22,.55)); }
+    .game-card-image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform .55s cubic-bezier(.2,.7,.2,1), filter .3s ease; }
+    .game-card:hover .game-card-image { transform: scale(1.055); filter: saturate(1.08); }
+    .game-card-category { position: absolute; z-index: 2; top: 12px; left: 12px; max-width: calc(100% - 65px); overflow: hidden; padding: 6px 9px; border: 1px solid rgba(230,239,255,.22); border-radius: 8px; color: #f3f6ff; background: rgba(9,14,29,.62); backdrop-filter: blur(9px); font-size: 9px; font-weight: 850; letter-spacing: .85px; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+    .game-card-play { position: absolute; z-index: 2; top: 11px; right: 11px; display: grid; width: 31px; height: 31px; place-items: center; border: 1px solid rgba(230,239,255,.26); border-radius: 50%; color: #fff; background: rgba(9,14,29,.58); backdrop-filter: blur(9px); transition: background .2s ease, transform .2s ease; }
+    .game-card:hover .game-card-play { transform: translateX(2px); background: rgba(138,112,232,.8); }
+    .game-card-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 54px; font-weight: 900; }
+    .game-card-body { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px 16px; }
+    .game-card-copy { min-width: 0; }
+    .game-card h3 { margin: 0 0 5px; font-size: 15px; letter-spacing: -.25px; }
+    .game-card p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .game-card-arrow { flex: 0 0 auto; display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid rgba(184,194,224,.14); border-radius: 10px; color: #c7b5ff; background: rgba(154,123,255,.08); transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+    .game-card:hover .game-card-arrow { transform: translateX(2px); border-color: rgba(173,153,255,.38); background: rgba(154,123,255,.16); }
     .game-card-link { display: block; }
     .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
@@ -595,6 +604,7 @@
         url: "games/neon-dash/",
         category: "Endless Runner",
         initial: "⚡",
+        thumbnail: "games/neon-dash/thumbnail.svg",
         color: "linear-gradient(135deg, #332b7a 0%, #137d80 100%)"
       },
       {
@@ -603,6 +613,7 @@
         url: "games/starfall/",
         category: "Space Shooter",
         initial: "✦",
+        thumbnail: "games/starfall/thumbnail.svg",
         color: "linear-gradient(135deg, #124f83 0%, #5d4d9b 100%)"
       },
       {
@@ -611,6 +622,7 @@
         url: "games/neon-tracks-3d/",
         category: "3D Endless Runner",
         initial: "🚇",
+        thumbnail: "games/neon-tracks-3d/thumbnail.svg",
         color: "linear-gradient(135deg, #332b7a 0%, #137d80 100%)"
       }
     ];
@@ -631,17 +643,50 @@
         const art = document.createElement("div");
         art.className = "game-card-art";
         if (game.color) art.style.background = game.color;
-        const initial = document.createElement("span");
-        initial.textContent = game.initial || game.title.slice(0, 1).toUpperCase();
-        art.appendChild(initial);
+
+        const fallback = document.createElement("div");
+        fallback.className = "game-card-fallback";
+        fallback.textContent = game.initial || game.title.slice(0, 1).toUpperCase();
+        art.appendChild(fallback);
+
+        if (game.thumbnail) {
+          const image = document.createElement("img");
+          image.className = "game-card-image";
+          image.src = game.thumbnail;
+          image.alt = game.title + " game artwork";
+          image.loading = "lazy";
+          image.decoding = "async";
+          image.addEventListener("load", function () { fallback.hidden = true; }, { once: true });
+          image.addEventListener("error", function () { image.remove(); }, { once: true });
+          art.appendChild(image);
+        }
+
+        const category = document.createElement("span");
+        category.className = "game-card-category";
+        category.textContent = game.category || "Arcade game";
+        art.appendChild(category);
+
+        const play = document.createElement("span");
+        play.className = "game-card-play";
+        play.setAttribute("aria-hidden", "true");
+        play.textContent = "↗";
+        art.appendChild(play);
 
         const body = document.createElement("div");
         body.className = "game-card-body";
+        const copy = document.createElement("div");
+        copy.className = "game-card-copy";
         const title = document.createElement("h3");
         title.textContent = game.title;
         const description = document.createElement("p");
         description.textContent = game.description || game.category || "Play now";
-        body.append(title, description);
+        copy.append(title, description);
+
+        const arrow = document.createElement("span");
+        arrow.className = "game-card-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+        body.append(copy, arrow);
         link.append(art, body);
         library.appendChild(link);
       });
