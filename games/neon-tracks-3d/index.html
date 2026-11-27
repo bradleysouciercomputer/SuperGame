@@ -832,9 +832,9 @@
         hitCooldown=Math.max(0,hitCooldown-dt);
         runner.position.y=jumpY;
         const sliding=slideTime>0;
-        runnerBody.scale.y+=(sliding?.72:1-runnerBody.scale.y)*Math.min(1,dt*14);
+        runnerBody.scale.y+=((sliding?.72:1)-runnerBody.scale.y)*Math.min(1,dt*14);
         runnerBody.position.y=sliding?-.22:0;
-        runnerBody.rotation.x+=(sliding?-.18:0-runnerBody.rotation.x)*Math.min(1,dt*10);
+        runnerBody.rotation.x+=((sliding?-.18:0)-runnerBody.rotation.x)*Math.min(1,dt*10);
         const running=jumpY<.05;
         const gait=visualTime*13;
         leftArm.rotation.x=running?Math.sin(gait)*.62:(jumpY>0?-.78:0);
