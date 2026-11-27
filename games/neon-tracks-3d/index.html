@@ -412,8 +412,8 @@
           }
         }
 
-        for(let i=0;i<16;i++){
-          const z=-139+i*9;
+        for(let i=0;i<12;i++){
+          const z=-139+i*12;
           for(const side of [-1,1])buildBuilding(side,z);
         }
         const starVertices=[];
@@ -444,15 +444,15 @@
         body.position.y=height/2-.2;body.castShadow=true;body.receiveShadow=true;group.add(body);
         const trimMat=Math.random()>.5?mats.neon:mats.purple;
         box(width+.1,.12,depth+.1,trimMat,0,height+.02,0,group);
-        for(let x=-width/2+.18;x<width/2;x+=.42){
-          box(.055,height*.82,.06,Math.random()>.5?mats.cityGlass:mats.cityB,x,height/2,depth/2+.045,group);
+        for(let x=-width/2+.2;x<width/2;x+=.68){
+          box(.04,height*.8,.05,Math.random()>.5?mats.cityGlass:mats.cityB,x,height/2,depth/2+.045,group);
         }
-        for(let y=1.1;y<height-1.1;y+=1.55){
-          for(let x=-width/2+.42;x<width/2-.18;x+=.78){
+        for(let y=1.2;y<height-1.1;y+=1.95){
+          for(let x=-width/2+.48;x<width/2-.18;x+=1.12){
             if(Math.random()>.17){
               const win=box(.34,.56,.065,Math.random()>.72?mats.purple:mats.cityGlass,x,y,depth/2+.07,group);
               win.material=win.material.clone();win.material.emissiveIntensity=.35+Math.random()*.8;
-              box(.39,.045,.08,mats.cityB,x,y-.34,depth/2+.09,group);
+              box(.36,.04,.07,mats.cityB,x,y-.34,depth/2+.09,group);
             }
           }
         }
@@ -562,7 +562,7 @@
         capsuleMesh(.135,.31,mats.pants,leftLowerLeg,0,-.2,0);
         const leftGuard=box(.21,.28,.07,mats.playerDark,0,-.22,-.13,leftLowerLeg);
         box(.17,.055,.08,mats.neon,0,-.18,-.175,leftLowerLeg);
-        const leftBoot=new THREE.Group();leftBoot.position.set(0,-.43,.055);leftLowerLeg.add(leftBoot);
+        const leftBoot=new THREE.Group();leftBoot.position.set(0,-.31,.055);leftLowerLeg.add(leftBoot);
         box(.31,.22,.49,mats.boot,0,-.04,.055,leftBoot);
         box(.32,.07,.5,mats.sole,0,-.15,.07,leftBoot);
         box(.27,.1,.22,mats.playerLight,0,.025,.18,leftBoot);
@@ -575,7 +575,7 @@
         capsuleMesh(.135,.31,mats.pants,rightLowerLeg,0,-.2,0);
         box(.21,.28,.07,mats.playerDark,0,-.22,-.13,rightLowerLeg);
         box(.17,.055,.08,mats.purple,0,-.18,-.175,rightLowerLeg);
-        const rightBoot=new THREE.Group();rightBoot.position.set(0,-.43,.055);rightLowerLeg.add(rightBoot);
+        const rightBoot=new THREE.Group();rightBoot.position.set(0,-.31,.055);rightLowerLeg.add(rightBoot);
         box(.31,.22,.49,mats.boot,0,-.04,.055,rightBoot);
         box(.32,.07,.5,mats.sole,0,-.15,.07,rightBoot);
         box(.27,.1,.22,mats.playerLight,0,.025,.18,rightBoot);
@@ -833,7 +833,8 @@
         runner.position.y=jumpY;
         const sliding=slideTime>0;
         runnerBody.scale.y+=(sliding?.72:1-runnerBody.scale.y)*Math.min(1,dt*14);
-        runnerBody.position.y=sliding?-.28:0;
+        runnerBody.position.y=sliding?-.22:0;
+        runnerBody.rotation.x+=(sliding?-.18:0-runnerBody.rotation.x)*Math.min(1,dt*10);
         const running=jumpY<.05;
         const gait=visualTime*13;
         leftArm.rotation.x=running?Math.sin(gait)*.62:(jumpY>0?-.78:0);
@@ -852,6 +853,7 @@
         for(const a of arches){a.position.z+=speed*dt;if(a.position.z>15)a.position.z-=176;}
         for(const l of streetLights){l.position.z+=speed*dt;if(l.position.z>17)l.position.z-=162;}
         for(const b of buildings){b.group.position.z+=speed*.72*dt;if(b.group.position.z>22)b.group.position.z-=168;}
+        for(const s of scenery){s.position.z+=speed*.72*dt;if(s.position.z>22)s.position.z-=168;}
       }
 
       function updateObjects(dt){
