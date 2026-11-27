@@ -218,7 +218,7 @@
       let elapsed = 0, speed = 19, lane = 1, laneCooldown = 0, jumpVelocity = 0, jumpY = 0, slideTime = 0, hitCooldown = 0;
       let spawnTimer = 1.3, patternCount = 0, shake = 0, flash = 0, visualTime = 0;
       let soundEnabled = true, audioContext = null, newBest = false;
-      let runner, runnerBody, leftArm, rightArm, leftLeg, rightLeg;
+      let runner, runnerBody, leftArm, rightArm, leftForearm, rightForearm, leftLeg, rightLeg, leftLowerLeg, rightLowerLeg;
       let railSleepers = [], streetLights = [], arches = [], buildings = [], scenery = [], obstacles = [], pickups = [], particles = [];
       let swipeStart = null, pointerId = null;
       const clockKeys = {left:false,right:false};
@@ -240,31 +240,78 @@
       }
       const mats = {};
       function makeMaterials(){
-        mats.floor=makeMaterial(0x10192e,.88,.28);
-        mats.floorLine=makeMaterial(0x4c638a,.55,.35,0x24406c,.35);
-        mats.rail=makeMaterial(0x9cacc4,.28,.85,0x203759,.25);
-        mats.sleeper=makeMaterial(0x293957,.82,.35);
-        mats.neon=makeMaterial(0x72e6df,.3,.45,0x42e0dc,2.2);
-        mats.purple=makeMaterial(0xa58aff,.3,.42,0x855eff,1.5);
-        mats.pink=makeMaterial(0xff729e,.38,.28,0xff3f85,1.2);
-        mats.yellow=makeMaterial(0xffd578,.34,.25,0xffa62b,.8);
-        mats.playerBody=makeMaterial(0x6fc9f1,.35,.38,0x2a83c5,.4);
-        mats.playerDark=makeMaterial(0x1a2948,.32,.4);
-        mats.playerLight=makeMaterial(0xbbaaff,.3,.25,0x9476ff,.7);
-        mats.glass=makeMaterial(0x1e4568,.22,.62,0x318dc2,.65);
+        mats.floor=makeMaterial(0x121a2b,.92,.18);
+        mats.floorLine=makeMaterial(0x56708f,.48,.55,0x254b73,.45);
+        mats.rail=makeMaterial(0x9eafc7,.2,.9,0x27496b,.22);
+        mats.sleeper=makeMaterial(0x26364e,.88,.22);
+        mats.neon=makeMaterial(0x72e6df,.24,.58,0x42e0dc,2.8);
+        mats.purple=makeMaterial(0xa58aff,.25,.48,0x855eff,2.1);
+        mats.pink=makeMaterial(0xff729e,.3,.35,0xff3f85,1.45);
+        mats.yellow=makeMaterial(0xffd578,.28,.42,0xffa62b,1.05);
+        mats.playerBody=makeMaterial(0x6fc9f1,.3,.35,0x2a83c5,.45);
+        mats.playerDark=makeMaterial(0x1a2948,.3,.5);
+        mats.playerLight=makeMaterial(0xbbaaff,.25,.35,0x9476ff,.85);
+        mats.glass=makeMaterial(0x1e4568,.16,.74,0x318dc2,.8);
         mats.cityA=makeMaterial(0x111b33,.82,.28);
         mats.cityB=makeMaterial(0x192544,.78,.32);
-        mats.cityGlass=makeMaterial(0x315b83,.3,.42,0x2f8bbd,.55);
-        mats.white=makeMaterial(0xe4f7ff,.32,.15,0x6dcbff,.7);
+        mats.cityGlass=makeMaterial(0x315b83,.24,.52,0x2f8bbd,.85);
+        mats.white=makeMaterial(0xe4f7ff,.22,.18,0x6dcbff,.8);
+        mats.skin=new THREE.MeshPhysicalMaterial({color:0xc98f78,roughness:.62,clearcoat:.08});
+        mats.hair=new THREE.MeshStandardMaterial({color:0x171c31,roughness:.82});
+        mats.hairLight=makeMaterial(0x35304e,.55,.12);
+        mats.jacket=new THREE.MeshPhysicalMaterial({color:0x6352a0,roughness:.43,metalness:.08,clearcoat:.28,clearcoatRoughness:.35});
+        mats.jacketDark=new THREE.MeshStandardMaterial({color:0x252a49,roughness:.58});
+        mats.jacketPanel=makeMaterial(0x9580df,.38,.22,0x5140aa,.42);
+        mats.pants=new THREE.MeshStandardMaterial({color:0x222c47,roughness:.78});
+        mats.pantsPanel=makeMaterial(0x405477,.6,.18);
+        mats.strap=new THREE.MeshStandardMaterial({color:0x151b30,roughness:.7});
+        mats.metal=makeMaterial(0xa8b9d1,.22,.86);
+        mats.boot=makeMaterial(0x182239,.36,.48);
+        mats.sole=makeMaterial(0x55dcd7,.3,.28,0x28cfc9,1.25);
+        mats.orange=makeMaterial(0xffa86d,.38,.25,0x8f4c29,.35);
+        mats.sign=makeMaterial(0x17294b,.35,.5,0x0c2b52,.3);
+      }
+
+      function capsuleMesh(radius,length,material,parent,x,y,z){
+        const mesh=new THREE.Mesh(new THREE.CapsuleGeometry(radius,length,7,14),material);
+        mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;
+      }
+
+      function addTube(points,radius,material,parent){
+        const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(p[0],p[1],p[2])));
+        const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(12,points.length*6),radius,8,false),material);
+        mesh.castShadow=true;parent.add(mesh);return mesh;
+      }
+
+      function makeDisplayTexture(title,subtitle,accent){
+        const c=document.createElement("canvas");c.width=512;c.height=160;
+        const g=c.getContext("2d");
+        const bg=g.createLinearGradient(0,0,512,160);bg.addColorStop(0,"#101a37");bg.addColorStop(1,"#25214e");
+        g.fillStyle=bg;g.fillRect(0,0,512,160);
+        g.fillStyle=accent;g.fillRect(0,0,9,160);
+        g.strokeStyle="rgba(151,191,255,.3)";g.lineWidth=2;g.strokeRect(16,16,480,128);
+        g.fillStyle="#f4f6ff";g.font="900 42px system-ui";g.fillText(title,34,73);
+        g.fillStyle=accent;g.font="700 19px system-ui";g.fillText(subtitle,36,111);
+        g.fillStyle="rgba(223,238,255,.54)";g.font="600 11px system-ui";g.fillText("SUPERGAME  •  NEON METRO NETWORK",36,137);
+        const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;return texture;
+      }
+
+      function displayPanel(parent,x,y,z,w,h,title,subtitle,accent,rotationY){
+        const group=new THREE.Group();group.position.set(x,y,z);if(rotationY)group.rotation.y=rotationY;parent.add(group);
+        const backing=new THREE.Mesh(new THREE.BoxGeometry(w+.16,h+.16,.18),mats.playerDark);backing.castShadow=true;group.add(backing);
+        const material=new THREE.MeshBasicMaterial({map:makeDisplayTexture(title,subtitle,accent),side:THREE.DoubleSide});
+        const face=new THREE.Mesh(new THREE.PlaneGeometry(w,h),material);face.position.z=.101;group.add(face);
+        const edge=new THREE.Mesh(new THREE.BoxGeometry(w+.25,.055,.22),accent==="#7be8e0"?mats.neon:mats.purple);edge.position.y=h/2+.11;group.add(edge);
+        return group;
       }
 
       function initThree(){
         renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:false,powerPreference:"high-performance"});
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
         renderer.setSize(wrap.clientWidth,wrap.clientWidth*9/16,false);
         renderer.outputColorSpace=THREE.SRGBColorSpace;
         renderer.toneMapping=THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure=1.17;
+        renderer.toneMappingExposure=1.28;
         renderer.shadowMap.enabled=true;
         renderer.shadowMap.type=THREE.PCFSoftShadowMap;
         scene=new THREE.Scene();
@@ -275,8 +322,8 @@
         camera.lookAt(0,1.15,-12);
         clock=new THREE.Clock();
 
-        scene.add(new THREE.HemisphereLight(0x9acaff,0x12142c,1.6));
-        const keyLight=new THREE.DirectionalLight(0xd8e8ff,2.0);keyLight.position.set(-5,12,7);keyLight.castShadow=true;keyLight.shadow.mapSize.set(1024,1024);keyLight.shadow.camera.left=-13;keyLight.shadow.camera.right=13;keyLight.shadow.camera.top=18;keyLight.shadow.camera.bottom=-12;scene.add(keyLight);
+        scene.add(new THREE.HemisphereLight(0xb6d8ff,0x17152d,1.85));
+        const keyLight=new THREE.DirectionalLight(0xd8e8ff,2.0);keyLight.position.set(-5,12,7);keyLight.castShadow=true;keyLight.shadow.mapSize.set(1536,1536);keyLight.shadow.camera.left=-13;keyLight.shadow.camera.right=13;keyLight.shadow.camera.top=18;keyLight.shadow.camera.bottom=-12;scene.add(keyLight);
         const cyanLight=new THREE.PointLight(0x35dede,28,42,2);cyanLight.position.set(-5,5,-12);scene.add(cyanLight);
         const violetLight=new THREE.PointLight(0x875cff,27,46,2);violetLight.position.set(5,5,-28);scene.add(violetLight);
         makeMaterials();buildWorld();createRunner();resize();
@@ -293,17 +340,31 @@
       }
 
       function buildWorld(){
-        const floor=new THREE.Mesh(new THREE.PlaneGeometry(13,190),mats.floor);floor.rotation.x=-Math.PI/2;floor.position.set(0,-.18,-62);floor.receiveShadow=true;scene.add(floor);
+        const floor=new THREE.Mesh(new THREE.PlaneGeometry(13,190),mats.floor);
+        floor.rotation.x=-Math.PI/2;floor.position.set(0,-.18,-62);floor.receiveShadow=true;scene.add(floor);
+        const ballast=new THREE.Mesh(new THREE.PlaneGeometry(8.6,190),makeMaterial(0x19263b,.96,.08));
+        ballast.rotation.x=-Math.PI/2;ballast.position.set(0,-.105,-62);scene.add(ballast);
         const sideFloorMat=makeMaterial(0x0b1427,.9,.2);
         for(const side of [-1,1]){
-          const sideFloor=new THREE.Mesh(new THREE.PlaneGeometry(16,190),sideFloorMat);sideFloor.rotation.x=-Math.PI/2;sideFloor.position.set(side*14,-.22,-62);scene.add(sideFloor);
+          const sideFloor=new THREE.Mesh(new THREE.PlaneGeometry(16,190),sideFloorMat);
+          sideFloor.rotation.x=-Math.PI/2;sideFloor.position.set(side*14,-.22,-62);scene.add(sideFloor);
+          box(.32,.55,185,mats.cityB,side*6.35,.02,-66);
+          box(.11,.08,185,mats.neon,side*6.16,.31,-66);
         }
+
+        // Three distinct running lanes, with paired steel rails, fasteners and wooden sleepers.
         for(let x=-3.55;x<=3.56;x+=2.37){
-          box(.15,.15,180,mats.rail,x,.02,-66);
-          box(.07,.08,180,mats.floorLine,x,.13,-66);
+          box(.18,.2,180,mats.rail,x,.015,-66);
+          box(.052,.065,180,mats.floorLine,x,.14,-66);
+          box(.12,.035,180,mats.metal,x,.132,-66);
         }
         for(let z=-150;z<20;z+=2.4){
-          const sleeper=box(9.1,.16,.42,mats.sleeper,0,-.045,z);
+          const sleeper=new THREE.Group();sleeper.position.set(0,-.045,z);scene.add(sleeper);
+          box(9.1,.16,.42,mats.sleeper,0,0,0,sleeper);
+          for(const x of [-3.55,-1.18,1.18,3.55]){
+            cylinder(.075,.075,.045,mats.metal,x,.105,-.06,sleeper,10);
+            cylinder(.075,.075,.045,mats.metal,x,.105,.06,sleeper,10);
+          }
           railSleepers.push(sleeper);
         }
         for(let x of [-3.65,-1.2,1.2,3.65]){
@@ -312,16 +373,47 @@
         for(let z=-150;z<10;z+=22){
           const g=new THREE.Group();g.position.z=z;scene.add(g);
           for(const x of [-5.3,5.3]){
-            box(.28,7.4,.32,mats.cityB,x,3.55,0,g);
-            box(.42,.1,.48,mats.neon,x,6.95,0,g);
-            for(let y=1.2;y<6.6;y+=1.35)box(.055,.55,.35,mats.cityGlass,x+(x<0?.17:-.17),y,.18,g);
+            box(.3,7.4,.4,mats.cityB,x,3.55,0,g);
+            box(.5,.14,.56,mats.neon,x,6.95,0,g);
+            box(.42,.12,.5,mats.purple,x,6.72,0,g);
+            for(let y=1.05;y<6.3;y+=1.12){
+              box(.065,.63,.38,mats.cityGlass,x+(x<0?.2:-.2),y,.2,g);
+              box(.08,.07,.4,mats.metal,x+(x<0?.2:-.2),y-.37,.2,g);
+            }
           }
-          box(10.8,.35,.38,mats.cityB,0,7.2,0,g);
-          box(10.4,.065,.44,mats.purple,0,7.42,0,g);
+          box(10.8,.38,.48,mats.cityB,0,7.2,0,g);
+          box(10.4,.075,.5,mats.purple,0,7.44,0,g);
+          box(9.9,.06,.38,mats.neon,0,7.0,0,g);
+          // Cross-braced ceiling ribs make the metro read as a built station rather than an open lane.
+          for(let x=-4.8;x<=4.81;x+=1.2){
+            const rib=box(.045,.055,.6,mats.metal,x,7.0,0,g);rib.rotation.z=(x/4.8)*.08;
+          }
+          if(Math.abs(z%44)<1){
+            displayPanel(g,0,5.75,.34,3.65,.9,"NEON METRO","LINE 03  •  CENTRAL", "#7be8e0",0);
+          }
           arches.push(g);
         }
-        for(let i=0;i<18;i++){
-          const z=-145+i*9;
+
+        // Repeating illuminated wall bays, signs and station advertisements.
+        for(let z=-140;z<4;z+=24){
+          for(const side of [-1,1]){
+            const bay=new THREE.Group();bay.position.set(side*6.05,0,z);bay.rotation.y=side<0?.12:-.12;scene.add(bay);
+            box(.26,5.8,.34,mats.cityB,0,2.85,0,bay);
+            box(.32,.12,7.6,mats.neon,0,5.76,0,bay);
+            box(.18,3.5,.26,mats.cityGlass,0,2.9,-1.3,bay);
+            box(.18,3.5,.26,mats.cityGlass,0,2.9,1.3,bay);
+            box(.1,2.8,.16,mats.purple,side<0?.17:-.17,2.85,0,bay);
+            const panel=displayPanel(bay,side<0?.2:-.2,4.35,.22,3.2,1.12,
+              side<0?"SUPERGAME":"NIGHT SERVICE",
+              side<0?"PLAY THE NIGHT":"CENTRAL  •  NEXT STOP",
+              side<0?"#7be8e0":"#b59aff",0);
+            const glow=new THREE.PointLight(side<0?0x51dfe7:0x9474ff,4.4,9,2);glow.position.set(0,4.6,1.3);bay.add(glow);
+            scenery.push(bay);
+          }
+        }
+
+        for(let i=0;i<16;i++){
+          const z=-139+i*9;
           for(const side of [-1,1])buildBuilding(side,z);
         }
         const starVertices=[];
@@ -335,9 +427,11 @@
         for(let z=-145;z<15;z+=18){
           const l=new THREE.Group();l.position.z=z;scene.add(l);
           for(const side of [-1,1]){
-            const post=cylinder(.055,.08,3.1,mats.cityB,side*5.7,4.15,0,l);
-            const lamp=box(.55,.08,.22,mats.neon,side*5.7,5.68,0,l);
-            const light=new THREE.PointLight(side<0?0x56d9ed:0xa080ff,7,14,2);light.position.set(side*5.5,5.2,0);l.add(light);
+            cylinder(.07,.095,3.1,mats.cityB,side*5.7,4.15,0,l);
+            box(.62,.1,.32,mats.neon,side*5.7,5.68,0,l);
+            box(.44,.065,.26,mats.white,side*5.7,5.57,0,l);
+            const light=new THREE.PointLight(side<0?0x56d9ed:0xa080ff,8,16,2);
+            light.position.set(side*5.5,5.2,0);l.add(light);
           }
           streetLights.push(l);
         }
@@ -345,98 +439,243 @@
 
       function buildBuilding(side,z){
         const group=new THREE.Group();group.position.set(side*(8.1+Math.random()*3.8),0,z);scene.add(group);
-        const width=2.5+Math.random()*2.8,height=6+Math.random()*16,depth=5+Math.random()*4;
-        const body=new THREE.Mesh(new THREE.BoxGeometry(width,height,depth),Math.random()>.5?mats.cityA:mats.cityB);body.position.y=height/2-0.2;body.castShadow=true;body.receiveShadow=true;group.add(body);
+        const width=2.5+Math.random()*2.8,height=7+Math.random()*15,depth=5+Math.random()*4;
+        const body=new THREE.Mesh(new THREE.BoxGeometry(width,height,depth),Math.random()>.5?mats.cityA:mats.cityB);
+        body.position.y=height/2-.2;body.castShadow=true;body.receiveShadow=true;group.add(body);
         const trimMat=Math.random()>.5?mats.neon:mats.purple;
-        const trim=box(width+.05,.08,depth+.06,trimMat,0,height/2+.1,0,group);
-        for(let y=1.1;y<height-1.2;y+=1.65){
-          for(let x=-width/2+.48;x<width/2-.2;x+=.78){
-            const win=box(.33,.58,.055,Math.random()>.73?mats.purple:mats.cityGlass,x,y,depth/2+.03,group);
-            win.material=win.material.clone();
-            win.material.emissiveIntensity=.25+Math.random()*.55;
+        box(width+.1,.12,depth+.1,trimMat,0,height+.02,0,group);
+        for(let x=-width/2+.18;x<width/2;x+=.42){
+          box(.055,height*.82,.06,Math.random()>.5?mats.cityGlass:mats.cityB,x,height/2,depth/2+.045,group);
+        }
+        for(let y=1.1;y<height-1.1;y+=1.55){
+          for(let x=-width/2+.42;x<width/2-.18;x+=.78){
+            if(Math.random()>.17){
+              const win=box(.34,.56,.065,Math.random()>.72?mats.purple:mats.cityGlass,x,y,depth/2+.07,group);
+              win.material=win.material.clone();win.material.emissiveIntensity=.35+Math.random()*.8;
+              box(.39,.045,.08,mats.cityB,x,y-.34,depth/2+.09,group);
+            }
           }
         }
-        const sign=box(width*.72,.32,.12,trimMat,0,height*.68,depth/2+.1,group);
-        sign.material=sign.material.clone();sign.material.emissiveIntensity=1.8;
+        // Rooftop machinery, aerials and illuminated vertical edge strips.
+        for(const x of [-width*.32,width*.32]){
+          box(.12,height*.82,.12,trimMat,x,height*.48,depth/2+.11,group);
+          box(.32,.24,.42,mats.cityB,x,height+.19,0,group);
+          cylinder(.035,.035,1.15,mats.metal,x,height+.86,0,group,8);
+          sphere(.09,mats.neon,x,height+1.48,0,group);
+        }
+        box(width*.76,.34,.18,trimMat,0,height*.68,depth/2+.12,group);
+        box(width*.62,.06,.21,mats.white,0,height*.68-.18,depth/2+.14,group);
+        for(let zt=-depth/2+.6;zt<depth/2;zt+=1.35){
+          box(width*.92,.055,.055,mats.metal,0,height*.35,zt,group);
+        }
         buildings.push({group,side});
       }
 
       function createRunner(){
         runner=new THREE.Group();runner.rotation.y=Math.PI;runner.position.set(laneX[lane],0,playerZ);scene.add(runner);
         runnerBody=new THREE.Group();runner.add(runnerBody);
-        const bodyGeo=new THREE.CapsuleGeometry(.34,.66,5,10);
-        const torso=new THREE.Mesh(bodyGeo,mats.playerBody);torso.position.y=1.22;torso.castShadow=true;runnerBody.add(torso);
-        const chest=new THREE.Mesh(new THREE.BoxGeometry(.42,.22,.1),mats.playerLight);chest.position.set(0,1.38,.31);runnerBody.add(chest);
-        const head=new THREE.Mesh(new THREE.SphereGeometry(.32,24,18),mats.playerLight);head.position.set(0,1.88,0);head.castShadow=true;runnerBody.add(head);
-        const helmet=new THREE.Mesh(new THREE.SphereGeometry(.34,24,14,0,Math.PI*2,0,Math.PI*.58),mats.playerDark);helmet.position.set(0,1.94,0);runnerBody.add(helmet);
-        const visor=new THREE.Mesh(new THREE.SphereGeometry(.22,20,12),mats.glass);visor.scale.set(1.28,.48,.45);visor.position.set(0,1.88,.265);runnerBody.add(visor);
-        const visorLine=box(.31,.035,.025,mats.neon,0,1.88,.37,runnerBody);
-        const pack=box(.5,.63,.25,mats.playerDark,0,1.25,-.36,runnerBody);
-        box(.34,.08,.29,mats.purple,0,1.45,-.52,runnerBody);
-        const armGeo=new THREE.CapsuleGeometry(.115,.5,4,8);
-        leftArm=new THREE.Group();leftArm.position.set(-.42,1.45,0);runnerBody.add(leftArm);
-        const la=new THREE.Mesh(armGeo,mats.playerLight);la.position.y=-.31;la.castShadow=true;leftArm.add(la);
-        rightArm=new THREE.Group();rightArm.position.set(.42,1.45,0);runnerBody.add(rightArm);
-        const ra=new THREE.Mesh(armGeo,mats.playerLight);ra.position.y=-.31;ra.castShadow=true;rightArm.add(ra);
-        const legGeo=new THREE.CapsuleGeometry(.145,.52,4,8);
-        leftLeg=new THREE.Group();leftLeg.position.set(-.2,.82,0);runnerBody.add(leftLeg);
-        const ll=new THREE.Mesh(legGeo,mats.playerDark);ll.position.y=-.3;ll.castShadow=true;leftLeg.add(ll);
-        box(.34,.18,.48,mats.neon,0,-.61,.09,leftLeg);
-        rightLeg=new THREE.Group();rightLeg.position.set(.2,.82,0);runnerBody.add(rightLeg);
-        const rl=new THREE.Mesh(legGeo,mats.playerDark);rl.position.y=-.3;rl.castShadow=true;rightLeg.add(rl);
-        box(.34,.18,.48,mats.purple,0,-.61,.09,rightLeg);
-        const glow=new THREE.PointLight(0x61e8ea,2.2,4,2);glow.position.set(0,.7,0);runner.add(glow);
+
+        // A layered street-runner silhouette: hood, technical jacket, backpack, segmented limbs and shoes.
+        const torsoShape=new THREE.Shape();
+        torsoShape.moveTo(-.34,.04);torsoShape.lineTo(-.4,.46);torsoShape.lineTo(-.55,.91);
+        torsoShape.quadraticCurveTo(-.57,1.03,-.43,1.08);torsoShape.lineTo(-.2,1.14);
+        torsoShape.quadraticCurveTo(0,1.18,.2,1.14);torsoShape.lineTo(.43,1.08);
+        torsoShape.quadraticCurveTo(.57,1.03,.55,.91);torsoShape.lineTo(.4,.46);
+        torsoShape.lineTo(.34,.04);torsoShape.quadraticCurveTo(0,-.04,-.34,.04);
+        const torsoGeo=new THREE.ExtrudeGeometry(torsoShape,{depth:.37,bevelEnabled:true,bevelSegments:4,steps:1,bevelSize:.045,bevelThickness:.045});
+        torsoGeo.translate(0,.91,-.185);
+        const torso=new THREE.Mesh(torsoGeo,mats.jacket);torso.castShadow=true;torso.receiveShadow=true;runnerBody.add(torso);
+
+        // Rear jacket yoke and hem panels.
+        const yoke=box(.72,.22,.075,mats.jacketPanel,0,1.83,-.225,runnerBody);
+        yoke.rotation.z=0;
+        box(.68,.12,.08,mats.jacketDark,0,1.03,-.225,runnerBody);
+        box(.13,.62,.055,mats.neon,-.295,1.45,-.226,runnerBody);
+        box(.13,.62,.055,mats.purple,.295,1.45,-.226,runnerBody);
+        for(const x of [-.18,.18]){
+          box(.035,.65,.05,mats.jacketDark,x,1.44,-.228,runnerBody);
+          box(.07,.075,.065,mats.metal,x,1.62,-.27,runnerBody);
+        }
+        // Hood, collar and neck.
+        const hood=new THREE.Mesh(new THREE.SphereGeometry(.42,28,20,0,Math.PI*2,0,Math.PI*.62),mats.jacketDark);
+        hood.position.set(0,1.83,-.17);hood.scale.set(1,.72,.68);hood.castShadow=true;runnerBody.add(hood);
+        const hoodRim=new THREE.Mesh(new THREE.TorusGeometry(.31,.055,10,32),mats.jacketPanel);
+        hoodRim.position.set(0,1.77,-.04);hoodRim.rotation.x=Math.PI/2;hoodRim.scale.set(1.08,.8,1);runnerBody.add(hoodRim);
+        capsuleMesh(.17,.16,mats.skin,runnerBody,0,1.86,0);
+        const head=new THREE.Mesh(new THREE.SphereGeometry(.285,32,24),mats.skin);
+        head.position.set(0,2.12,0);head.castShadow=true;runnerBody.add(head);
+        // Hair and a compact high-top cap, with side locks and ear details visible in the run view.
+        const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.3,32,18,0,Math.PI*2,0,Math.PI*.58),mats.hair);
+        hairCap.position.set(0,2.18,-.015);hairCap.scale.set(1.02,.96,1.03);runnerBody.add(hairCap);
+        sphere(.11,mats.hair,0,2.0,-.19,runnerBody,[.8,1.25,.68]);
+        for(const side of [-1,1]){
+          const lock=sphere(.105,mats.hair,side*.235,2.04,-.015,runnerBody,[.8,1.18,.8]);
+          const ear=sphere(.07,mats.skin,side*.275,2.08,.015,runnerBody,[.7,1,.6]);
+          const earCup=cylinder(.075,.075,.065,mats.metal,side*.3,2.08,-.035,runnerBody,16);earCup.rotation.z=Math.PI/2;
+          sphere(.045,mats.neon,side*.34,2.08,-.035,runnerBody,[.55,1,1]);
+        }
+        // Backpack is a separate hard-shell piece with piping, two straps and a glowing badge.
+        const pack=new THREE.Group();pack.position.set(0,1.38,-.34);runnerBody.add(pack);
+        const packShape=new THREE.Shape();packShape.moveTo(-.27,-.32);packShape.lineTo(-.3,.25);
+        packShape.quadraticCurveTo(-.3,.34,-.2,.36);packShape.lineTo(.2,.36);
+        packShape.quadraticCurveTo(.3,.34,.3,.25);packShape.lineTo(.27,-.32);
+        packShape.quadraticCurveTo(0,-.4,-.27,-.32);
+        const packGeo=new THREE.ExtrudeGeometry(packShape,{depth:.22,bevelEnabled:true,bevelSegments:3,bevelSize:.045,bevelThickness:.04});
+        packGeo.translate(0,0,-.11);
+        const packMesh=new THREE.Mesh(packGeo,mats.playerDark);packMesh.castShadow=true;pack.add(packMesh);
+        box(.43,.3,.07,mats.jacketPanel,0,.12,-.145,pack);
+        box(.34,.075,.075,mats.neon,0,.12,-.19,pack);
+        box(.32,.2,.075,mats.strap,0,-.19,-.15,pack);
+        box(.16,.09,.08,mats.yellow,0,-.19,-.2,pack);
+        for(const side of [-1,1]){
+          const strap=box(.095,.72,.08,mats.strap,side*.36,1.45,-.16,runnerBody);strap.rotation.z=side*.16;
+          box(.12,.09,.09,mats.metal,side*.36,1.35,-.215,runnerBody);
+        }
+        // A small scarf tab catches the air behind the runner.
+        const scarf=box(.16,.48,.045,mats.pink,.19,1.78,-.47,runnerBody);scarf.rotation.z=-.16;
+
+        // Upper arms pivot at the shoulders; separate forearms and gloves make the run cycle readable.
+        const armGeo=new THREE.CapsuleGeometry(.145,.34,7,14);
+        leftArm=new THREE.Group();leftArm.position.set(-.49,1.73,0);runnerBody.add(leftArm);
+        const leftSleeve=new THREE.Mesh(armGeo,mats.jacketPanel);leftSleeve.position.y=-.25;leftSleeve.castShadow=true;leftArm.add(leftSleeve);
+        sphere(.17,mats.jacketDark,-.015,-.06,0,leftArm,[1,.72,1]);
+        leftForearm=new THREE.Group();leftForearm.position.set(0,-.46,0);leftArm.add(leftForearm);
+        capsuleMesh(.105,.28,mats.playerLight,leftForearm,0,-.19,0);
+        box(.23,.075,.23,mats.jacketDark,0,-.34,0,leftForearm);
+        sphere(.12,mats.strap,0,-.43,.015,leftForearm,[.95,1.15,.9]);
+        box(.1,.18,.045,mats.neon,0,-.18,.105,leftForearm);
+        rightArm=new THREE.Group();rightArm.position.set(.49,1.73,0);runnerBody.add(rightArm);
+        const rightSleeve=new THREE.Mesh(armGeo,mats.jacket);rightSleeve.position.y=-.25;rightSleeve.castShadow=true;rightArm.add(rightSleeve);
+        sphere(.17,mats.jacketDark,.015,-.06,0,rightArm,[1,.72,1]);
+        rightForearm=new THREE.Group();rightForearm.position.set(0,-.46,0);rightArm.add(rightForearm);
+        capsuleMesh(.105,.28,mats.playerLight,rightForearm,0,-.19,0);
+        box(.23,.075,.23,mats.jacketDark,0,-.34,0,rightForearm);
+        sphere(.12,mats.strap,0,-.43,.015,rightForearm,[.95,1.15,.9]);
+        box(.1,.18,.045,mats.purple,0,-.18,.105,rightForearm);
+
+        // Fitted joggers, articulated knees, shin guards and detailed high-top trainers.
+        const legGeo=new THREE.CapsuleGeometry(.17,.37,7,14);
+        leftLeg=new THREE.Group();leftLeg.position.set(-.21,.99,0);runnerBody.add(leftLeg);
+        capsuleMesh(.17,.37,mats.pants,leftLeg,0,-.23,0);
+        box(.25,.09,.07,mats.pantsPanel,0,-.31,-.145,leftLeg);
+        leftLowerLeg=new THREE.Group();leftLowerLeg.position.set(0,-.48,0);leftLeg.add(leftLowerLeg);
+        capsuleMesh(.135,.31,mats.pants,leftLowerLeg,0,-.2,0);
+        const leftGuard=box(.21,.28,.07,mats.playerDark,0,-.22,-.13,leftLowerLeg);
+        box(.17,.055,.08,mats.neon,0,-.18,-.175,leftLowerLeg);
+        const leftBoot=new THREE.Group();leftBoot.position.set(0,-.43,.055);leftLowerLeg.add(leftBoot);
+        box(.31,.22,.49,mats.boot,0,-.04,.055,leftBoot);
+        box(.32,.07,.5,mats.sole,0,-.15,.07,leftBoot);
+        box(.27,.1,.22,mats.playerLight,0,.025,.18,leftBoot);
+        for(let i=0;i<3;i++)box(.19,.022,.027,mats.white,0,.08+i*.035,.15-i*.035,leftBoot);
+
+        rightLeg=new THREE.Group();rightLeg.position.set(.21,.99,0);runnerBody.add(rightLeg);
+        capsuleMesh(.17,.37,mats.pants,rightLeg,0,-.23,0);
+        box(.25,.09,.07,mats.pantsPanel,0,-.31,-.145,rightLeg);
+        rightLowerLeg=new THREE.Group();rightLowerLeg.position.set(0,-.48,0);rightLeg.add(rightLowerLeg);
+        capsuleMesh(.135,.31,mats.pants,rightLowerLeg,0,-.2,0);
+        box(.21,.28,.07,mats.playerDark,0,-.22,-.13,rightLowerLeg);
+        box(.17,.055,.08,mats.purple,0,-.18,-.175,rightLowerLeg);
+        const rightBoot=new THREE.Group();rightBoot.position.set(0,-.43,.055);rightLowerLeg.add(rightBoot);
+        box(.31,.22,.49,mats.boot,0,-.04,.055,rightBoot);
+        box(.32,.07,.5,mats.sole,0,-.15,.07,rightBoot);
+        box(.27,.1,.22,mats.playerLight,0,.025,.18,rightBoot);
+        for(let i=0;i<3;i++)box(.19,.022,.027,mats.white,0,.08+i*.035,.15-i*.035,rightBoot);
+
+        // Small reflective piping and a soft rim light finish the silhouette.
+        addTube([[-.38,1.45,-.22],[-.28,1.05,-.22],[0,1.0,-.24],[.28,1.05,-.22],[.38,1.45,-.22]],.018,mats.neon,runnerBody);
+        const glow=new THREE.PointLight(0x61e8ea,2.6,4,2);glow.position.set(0,.85,-.1);runner.add(glow);
       }
 
       function createTrain(){
         const group=new THREE.Group();
-        const bodyMat=makeMaterial(0x203957,.28,.66,0x174b6a,.45);
-        const body=box(2.08,3.28,5.8,bodyMat,0,1.68,0,group);
-        box(2.12,.16,5.86,mats.neon,0,3.32,0,group);
-        box(1.9,.11,5.5,mats.playerDark,0,3.39,-.08,group);
-        const front=box(1.72,1.55,.1,mats.cityGlass,0,2.15,2.96,group);
-        front.material=front.material.clone();front.material.emissive.setHex(0x1f8bb4);front.material.emissiveIntensity=.75;
-        box(1.58,.08,.12,mats.neon,0,1.35,3.03,group);
+        const bodyMat=new THREE.MeshPhysicalMaterial({color:0x253d5a,roughness:.28,metalness:.72,clearcoat:.65,clearcoatRoughness:.24});
+        const bodyShape=new THREE.Shape();
+        bodyShape.moveTo(-.94,.08);bodyShape.lineTo(.94,.08);bodyShape.lineTo(.98,2.55);
+        bodyShape.quadraticCurveTo(.98,3.18,.58,3.3);bodyShape.lineTo(-.58,3.3);
+        bodyShape.quadraticCurveTo(-.98,3.18,-.98,2.55);bodyShape.closePath();
+        const bodyGeo=new THREE.ExtrudeGeometry(bodyShape,{depth:5.75,bevelEnabled:true,bevelSegments:5,steps:1,bevelSize:.1,bevelThickness:.1});
+        bodyGeo.translate(0,0,-2.875);
+        const body=new THREE.Mesh(bodyGeo,bodyMat);body.castShadow=true;body.receiveShadow=true;group.add(body);
+        // Front glass, segmented windshield and a shaped lower bumper.
+        const wind=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.12,.105),mats.glass);wind.position.set(0,2.37,2.91);wind.castShadow=true;group.add(wind);
+        const windTop=box(1.65,.1,.13,mats.playerDark,0,2.98,2.9,group);
+        const windBase=box(1.68,.11,.15,mats.neon,0,1.78,2.95,group);
+        const mullion=box(.055,1.02,.13,mats.metal,0,2.39,2.98,group);
         for(const x of [-.72,.72]){
-          box(.24,.16,.1,mats.yellow,x,.65,3.02,group);
-          box(.18,.22,.1,mats.white,x,2.98,3.02,group);
-          const strip=box(.075,1.05,.13,mats.purple,x,2.06,3.02,group);
+          const lamp=box(.2,.25,.16,mats.white,x,1.13,2.93,group);
+          const halo=box(.28,.07,.17,mats.yellow,x,1.43,2.94,group);
+          const bumper=box(.36,.18,.24,mats.playerDark,x,.55,2.9,group);
+          box(.3,.045,.25,mats.pink,x,.54,3.03,group);
         }
+        // Roof housings and air-conditioning modules.
+        box(1.55,.18,1.2,mats.playerDark,0,3.39,-1.1,group);
+        for(const z of [-1.9,-1.45,-1.0,-.55]){
+          box(1.2,.065,.16,mats.metal,0,3.51,z,group);
+        }
+        box(.28,.12,.78,mats.purple,0,3.49,1.45,group);
+        // Detailed carriage sides: doors, windows, waist stripes and undercarriage.
         for(const side of [-1,1]){
-          for(let z=-2;z<=2;z+=1.2){
-            const window=box(.035,.86,.78,mats.glass,side*1.055,2.35,z,group);
+          box(.065,.13,5.4,mats.neon,side*1.0,1.2,0,group);
+          box(.065,.07,5.4,mats.purple,side*1.0,1.04,0,group);
+          for(let z=-2.35;z<=2.36;z+=1.17){
+            const window=box(.045,.88,.78,mats.glass,side*1.005,2.38,z,group);
+            box(.07,.08,.86,mats.metal,side*1.04,2.85,z,group);
           }
-          box(.06,.1,5.2,mats.purple,side*1.07,1.05,0,group);
+          for(const z of [-1.3,1.2]){
+            box(.06,1.55,.88,mats.playerDark,side*1.012,2.1,z,group);
+            box(.075,1.28,.07,mats.neon,side*1.055,2.12,z-.36,group);
+            box(.075,1.28,.07,mats.neon,side*1.055,2.12,z+.36,group);
+            box(.08,.07,.68,mats.metal,side*1.06,2.77,z,group);
+          }
+          // Bogies, wheels and articulated undercarriage.
+          box(.9,.35,1.05,mats.playerDark,side*.62,.36,-1.85,group);
+          box(.9,.35,1.05,mats.playerDark,side*.62,.36,1.85,group);
+          for(const z of [-2.18,-1.5,1.5,2.18]){
+            const wheel=cylinder(.25,.25,.16,mats.playerDark,side*1.015,.35,z,group,20);wheel.rotation.z=Math.PI/2;
+            const hub=cylinder(.105,.105,.18,mats.metal,side*1.12,.35,z,group,16);hub.rotation.z=Math.PI/2;
+          }
         }
-        group.userData={kind:"train"};
-        return group;
+        // Route badge on the nose.
+        const badge=box(.62,.27,.09,mats.playerDark,0,1.55,3.02,group);
+        box(.35,.045,.11,mats.neon,0,1.56,3.08,group);
+        group.userData={kind:"train"};return group;
       }
 
       function createBarrier(){
         const g=new THREE.Group();
-        box(1.88,.98,.35,mats.pink,0,.66,0,g);
-        box(1.98,.12,.43,mats.yellow,0,1.18,0,g);
-        for(let x=-.72;x<=.73;x+=.48){
-          const stripe=box(.17,.8,.04,mats.yellow,x,.66,.2,g);stripe.rotation.z=-.4;
+        const base=box(1.88,.9,.38,mats.pink,0,.62,0,g);
+        base.rotation.z=0;
+        box(2.02,.16,.48,mats.yellow,0,1.13,0,g);
+        box(1.74,.08,.49,mats.playerDark,0,.98,.015,g);
+        for(let x=-.68;x<=.69;x+=.46){
+          const stripe=box(.17,.69,.065,mats.yellow,x,.61,.235,g);stripe.rotation.z=-.48;
         }
-        for(const x of [-.77,.77]){
-          box(.13,.28,.16,mats.playerDark,x,.16,0,g);
-          box(.16,.08,.2,mats.white,x,.31,0,g);
+        for(const x of [-.8,.8]){
+          box(.14,.25,.2,mats.playerDark,x,.14,0,g);
+          box(.18,.075,.22,mats.white,x,.29,.015,g);
+          cylinder(.055,.055,.14,mats.metal,x,.33,.02,g,10);
         }
         g.userData={kind:"barrier"};return g;
       }
 
       function createGate(){
         const g=new THREE.Group();
-        for(const x of [-.92,.92]){
-          box(.13,2.55,.18,mats.playerDark,x,1.28,0,g);
-          box(.2,.11,.24,mats.neon,x,2.47,0,g);
+        for(const x of [-.98,.98]){
+          box(.16,2.5,.22,mats.playerDark,x,1.25,0,g);
+          box(.22,.14,.28,mats.neon,x,2.43,0,g);
+          box(.22,.12,.29,mats.purple,x,2.2,0,g);
+          cylinder(.12,.12,.32,mats.metal,x,1.85,0,g,12);
         }
-        box(2.05,.24,.28,mats.pink,0,2.25,0,g);
-        box(1.94,.055,.31,mats.yellow,0,2.25,.015,g);
-        box(.3,.1,.3,mats.purple,0,2.49,0,g);
+        box(2.18,.28,.38,mats.pink,0,2.22,0,g);
+        box(2.04,.075,.4,mats.yellow,0,2.22,.02,g);
+        for(let x=-.7;x<=.71;x+=.35){
+          const stripe=box(.11,.22,.035,mats.white,x,2.22,.225,g);stripe.rotation.z=-.5;
+        }
+        box(.32,.12,.38,mats.purple,0,2.48,0,g);
         g.userData={kind:"gate"};return g;
       }
+
+      
 
       function createObstacle(type,laneIndex,z){
         const g=type==="train"?createTrain():type==="barrier"?createBarrier():createGate();
@@ -593,14 +832,18 @@
         hitCooldown=Math.max(0,hitCooldown-dt);
         runner.position.y=jumpY;
         const sliding=slideTime>0;
-        runnerBody.scale.y+=(sliding?.54:1-runnerBody.scale.y)*Math.min(1,dt*14);
-        runnerBody.position.y=sliding?-.12:0;
+        runnerBody.scale.y+=(sliding?.72:1-runnerBody.scale.y)*Math.min(1,dt*14);
+        runnerBody.position.y=sliding?-.28:0;
         const running=jumpY<.05;
         const gait=visualTime*13;
-        leftArm.rotation.x=running?Math.sin(gait)*.72:(jumpY>0?-.85:0);
-        rightArm.rotation.x=running?Math.sin(gait+Math.PI)*.72:(jumpY>0?-.85:0);
-        leftLeg.rotation.x=running?Math.sin(gait+Math.PI)*.66:jumpY>0?-.32:0;
-        rightLeg.rotation.x=running?Math.sin(gait)*.66:jumpY>0?.32:0;
+        leftArm.rotation.x=running?Math.sin(gait)*.62:(jumpY>0?-.78:0);
+        rightArm.rotation.x=running?Math.sin(gait+Math.PI)*.62:(jumpY>0?-.78:0);
+        leftForearm.rotation.x=running?-.22+Math.max(0,Math.sin(gait+Math.PI))*.32:0;
+        rightForearm.rotation.x=running?-.22+Math.max(0,Math.sin(gait))*.32:0;
+        leftLeg.rotation.x=running?Math.sin(gait+Math.PI)*.58:jumpY>0?-.28:0;
+        rightLeg.rotation.x=running?Math.sin(gait)*.58:jumpY>0?.28:0;
+        leftLowerLeg.rotation.x=running?Math.max(0,Math.sin(gait))*.82:jumpY>0?.32:0;
+        rightLowerLeg.rotation.x=running?Math.max(0,Math.sin(gait+Math.PI))*.82:jumpY>0?.32:0;
         runner.rotation.z+=(Math.max(-.16,Math.min(.16,(target-runner.position.x)*-.07))-runner.rotation.z)*Math.min(1,dt*8);
       }
 
