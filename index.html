@@ -588,7 +588,16 @@
   <script>
     // Add each new game here when it is ready to publish.
     // Example: { title: "Game name", description: "A short description.", url: "games/game-name/", category: "Arcade", initial: "G" }
-    const games = [];
+    const games = [
+      {
+        title: "Neon Dash",
+        description: "Jump, dodge, and chase your high score.",
+        url: "games/neon-dash/",
+        category: "Endless Runner",
+        initial: "⚡",
+        color: "linear-gradient(135deg, #332b7a 0%, #137d80 100%)"
+      }
+    ];
 
     const library = document.getElementById("gameLibrary");
     const gameCount = document.getElementById("gameCount");
@@ -605,6 +614,7 @@
 
         const art = document.createElement("div");
         art.className = "game-card-art";
+        if (game.color) art.style.background = game.color;
         const initial = document.createElement("span");
         initial.textContent = game.initial || game.title.slice(0, 1).toUpperCase();
         art.appendChild(initial);
