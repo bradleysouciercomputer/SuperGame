@@ -350,6 +350,7 @@
     .game-card-play { position: absolute; z-index: 2; top: 11px; right: 11px; display: grid; width: 31px; height: 31px; place-items: center; border: 1px solid rgba(230,239,255,.26); border-radius: 50%; color: #fff; background: rgba(9,14,29,.58); backdrop-filter: blur(9px); transition: background .2s ease, transform .2s ease; }
     .game-card:hover .game-card-play { transform: translateX(2px); background: rgba(138,112,232,.8); }
     .game-card-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 54px; font-weight: 900; }
+    .game-card-fallback[hidden] { display: none !important; }
     .game-card-body { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px 16px; }
     .game-card-copy { min-width: 0; }
     .game-card h3 { margin: 0 0 5px; font-size: 15px; letter-spacing: -.25px; }
