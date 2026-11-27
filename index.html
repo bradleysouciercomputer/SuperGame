@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b13">
+  <meta name="description" content="SuperGame is a growing arcade of original games. Discover something new, jump in, and play right in your browser.">
+  <title>SuperGame — Your next game starts here</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b13;
+      --surface: #111522;
+      --surface-raised: #171c2c;
+      --text: #f5f6ff;
+      --muted: #a0a7bd;
+      --muted-2: #737d96;
+      --line: rgba(184, 194, 224, .12);
+      --purple: #9a7bff;
+      --purple-bright: #b49cff;
+      --cyan: #68e2e5;
+      --green: #a5f1c1;
+      --radius: 22px;
+      --content: 1160px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(ellipse at 78% 3%, rgba(106, 76, 210, .16), transparent 34rem),
+        radial-gradient(ellipse at 4% 34%, rgba(37, 134, 154, .09), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    body::before {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+      opacity: .15;
+      background-image: radial-gradient(rgba(255,255,255,.34) .65px, transparent .65px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .container { width: min(var(--content), calc(100% - 48px)); margin-inline: auto; }
+
+    .site-header {
+      position: sticky;
+      z-index: 20;
+      top: 0;
+      border-bottom: 1px solid rgba(184,194,224,.08);
+      background: rgba(9,11,19,.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .nav-wrap {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; flex-shrink: 0; }
+    .brand-mark {
+      display: grid;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      border: 1px solid rgba(190,173,255,.45);
+      border-radius: 13px;
+      color: #fff;
+      background: linear-gradient(145deg, #9b7aff, #6349d7);
+      box-shadow: 0 6px 24px rgba(116,83,226,.3), inset 0 1px rgba(255,255,255,.3);
+    }
+    .brand-name { font-size: 19px; font-weight: 850; letter-spacing: -.7px; }
+    .brand-name span { color: var(--purple-bright); }
+    .nav-links { display: flex; align-items: center; gap: 34px; margin-left: auto; }
+    .nav-links a {
+      color: #b6bdd0;
+      font-size: 13px;
+      font-weight: 650;
+      transition: color .18s ease;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-play {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 0 17px;
+      border: 1px solid rgba(180,156,255,.32);
+      border-radius: 12px;
+      background: rgba(154,123,255,.13);
+      color: #e8e0ff;
+      font-size: 13px;
+      font-weight: 750;
+      transition: background .18s ease, transform .18s ease, border-color .18s ease;
+    }
+    .nav-play:hover { transform: translateY(-1px); background: rgba(154,123,255,.22); border-color: rgba(180,156,255,.62); }
+    .menu-toggle {
+      display: none;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      color: white;
+      cursor: pointer;
+    }
+
+    .hero { padding: 76px 0 57px; }
+    .hero-grid { display: grid; grid-template-columns: 1fr .94fr; align-items: center; gap: clamp(38px, 6vw, 76px); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 11px;
+      border: 1px solid rgba(165,241,193,.19);
+      border-radius: 999px;
+      background: rgba(87,180,130,.08);
+      color: #b5f2ca;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.45px;
+      text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #8ce7ac; box-shadow: 0 0 12px rgba(140,231,172,.8); }
+    h1 {
+      max-width: 660px;
+      margin: 24px 0 19px;
+      font-size: clamp(48px, 6.4vw, 78px);
+      font-weight: 850;
+      line-height: .99;
+      letter-spacing: -5.1px;
+    }
+    h1 .gradient {
+      color: transparent;
+      background: linear-gradient(100deg, #b7a1ff 4%, #8d9aff 48%, #75e3df 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    .hero-copy > p {
+      max-width: 500px;
+      margin: 0;
+      color: #aab2c6;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+    .hero-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 13px; margin-top: 31px; }
+    .button-primary, .button-secondary {
+      display: inline-flex;
+      min-height: 50px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 19px;
+      border-radius: 13px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .button-primary {
+      color: #100d1d;
+      background: linear-gradient(105deg, #b9a4ff, #8cdbdf);
+      box-shadow: 0 9px 30px rgba(137,119,235,.22), inset 0 1px rgba(255,255,255,.65);
+    }
+    .button-primary:hover { transform: translateY(-2px); box-shadow: 0 13px 34px rgba(137,119,235,.32); }
+    .button-secondary { border: 1px solid rgba(184,194,224,.17); color: #d4d9e9; background: rgba(255,255,255,.035); }
+    .button-secondary:hover { transform: translateY(-2px); background: rgba(255,255,255,.075); }
+    .hero-note { display: flex; align-items: center; gap: 9px; margin-top: 24px; color: #7f899f; font-size: 11px; font-weight: 650; }
+    .hero-note svg { color: #8dd8c5; }
+
+    .showcase {
+      position: relative;
+      min-height: 408px;
+      padding: 17px;
+      overflow: hidden;
+      border: 1px solid rgba(195,183,255,.2);
+      border-radius: 27px;
+      background:
+        linear-gradient(145deg, rgba(39,37,72,.94), rgba(18,24,42,.96) 58%, rgba(14,32,43,.97));
+      box-shadow: 0 30px 90px rgba(0,0,0,.3), 0 0 70px rgba(125,97,220,.11), inset 0 1px rgba(255,255,255,.08);
+      isolation: isolate;
+    }
+    .showcase::before, .showcase::after { position: absolute; z-index: -1; content: ""; border-radius: 50%; filter: blur(1px); }
+    .showcase::before { width: 250px; height: 250px; top: -120px; right: -70px; background: rgba(154,123,255,.2); }
+    .showcase::after { width: 230px; height: 230px; bottom: -140px; left: -70px; background: rgba(68,198,194,.12); }
+    .showcase-top { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 15px; }
+    .showcase-label { color: #c7c4e7; font-size: 10px; font-weight: 850; letter-spacing: 1.7px; }
+    .window-dots { display: flex; gap: 5px; }
+    .window-dots i { display: block; width: 6px; height: 6px; border-radius: 50%; background: rgba(218,220,255,.3); }
+    .game-scene {
+      position: relative;
+      height: 275px;
+      overflow: hidden;
+      border: 1px solid rgba(222,219,255,.2);
+      border-radius: 17px;
+      background: linear-gradient(180deg, #3b3878 0%, #7869b5 48%, #d58ab5 100%);
+      box-shadow: inset 0 1px rgba(255,255,255,.16);
+    }
+    .scene-sun { position: absolute; top: 42px; right: 17%; width: 62px; height: 62px; border-radius: 50%; background: #ffd7a6; box-shadow: 0 0 44px rgba(255,205,159,.5); }
+    .scene-star { position: absolute; width: 4px; height: 4px; background: #fff0dc; border-radius: 50%; box-shadow: 0 0 9px rgba(255,255,255,.8); }
+    .star-a { top: 27px; left: 17%; } .star-b { top: 68px; left: 43%; width: 3px; height: 3px; }
+    .star-c { top: 44px; right: 39%; width: 3px; height: 3px; } .star-d { top: 111px; right: 11%; }
+    .cloud { position: absolute; width: 86px; height: 20px; border-radius: 50px; background: rgba(232,203,231,.18); filter: blur(1px); }
+    .cloud::before, .cloud::after { position: absolute; content: ""; bottom: 4px; border-radius: 50%; background: inherit; }
+    .cloud::before { width: 31px; height: 31px; left: 14px; } .cloud::after { width: 23px; height: 23px; left: 39px; }
+    .cloud-a { top: 91px; left: 12%; transform: scale(.78); } .cloud-b { top: 137px; right: 16%; transform: scale(.62); }
+    .mountain { position: absolute; bottom: 47px; width: 0; height: 0; border-left: 125px solid transparent; border-right: 125px solid transparent; border-bottom: 137px solid #65558e; }
+    .mountain-a { left: -35px; border-bottom-color: #62548d; }
+    .mountain-b { left: 26%; transform: scale(.82); transform-origin: bottom; border-bottom-color: #514d80; }
+    .mountain-c { right: -48px; transform: scale(.9); transform-origin: bottom; border-bottom-color: #625184; }
+    .ridge { position: absolute; right: -4%; bottom: 0; left: -4%; height: 94px; border-radius: 50% 50% 0 0 / 26% 26% 0 0; background: linear-gradient(180deg, #303e69, #202d50); }
+    .platform { position: absolute; z-index: 2; bottom: 47px; left: 13%; width: 73%; height: 12px; border: 2px solid #a9f2d1; border-radius: 4px; background: #456c83; box-shadow: 0 5px 0 #23384f, 0 0 20px rgba(118,239,194,.28); }
+    .platform::before, .platform::after { position: absolute; top: 10px; width: 8px; height: 22px; content: ""; background: #344b68; }
+    .platform::before { left: 12%; } .platform::after { right: 12%; }
+    .pixel-player {
+      position: absolute;
+      z-index: 4;
+      bottom: 60px;
+      left: 39%;
+      width: 31px;
+      height: 41px;
+      border: 3px solid #20243c;
+      border-radius: 7px 7px 4px 4px;
+      background: #f7bd87;
+      box-shadow: 0 0 0 2px rgba(255,255,255,.16), 0 0 25px rgba(255,213,160,.32);
+      animation: bob 2.1s ease-in-out infinite;
+    }
+    .pixel-player::before { position: absolute; top: 10px; left: 7px; width: 5px; height: 5px; content: ""; background: #25243c; box-shadow: 10px 0 #25243c; }
+    .pixel-player::after { position: absolute; bottom: -9px; left: -3px; width: 12px; height: 9px; content: ""; border-radius: 2px; background: #f4d8b0; box-shadow: 16px 0 #f4d8b0; }
+    .scene-caption { position: absolute; z-index: 5; top: 15px; left: 16px; color: rgba(255,255,255,.82); font-size: 9px; font-weight: 850; letter-spacing: 1.3px; text-shadow: 0 1px 5px rgba(0,0,0,.2); }
+    .scene-chip { position: absolute; z-index: 5; right: 15px; bottom: 14px; padding: 6px 9px; border: 1px solid rgba(255,255,255,.2); border-radius: 7px; background: rgba(22,25,49,.38); color: rgba(255,255,255,.88); font-size: 9px; font-weight: 800; letter-spacing: .7px; backdrop-filter: blur(8px); }
+    .showcase-bottom { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 4px 1px; }
+    .showcase-bottom strong { display: block; font-size: 14px; letter-spacing: -.3px; }
+    .showcase-bottom span { display: block; margin-top: 3px; color: #9da5bd; font-size: 11px; }
+    .coming-tag { flex-shrink: 0; padding: 7px 10px; border: 1px solid rgba(180,156,255,.24); border-radius: 8px; background: rgba(154,123,255,.12); color: #d6caff; font-size: 9px; font-weight: 850; letter-spacing: .8px; text-transform: uppercase; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+    .trust-strip { margin: 8px 0 83px; border-block: 1px solid rgba(184,194,224,.1); background: rgba(255,255,255,.018); }
+    .trust-inner { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .trust-item { display: flex; align-items: center; justify-content: center; gap: 11px; min-height: 76px; color: #c3c9d9; font-size: 12px; font-weight: 700; }
+    .trust-item + .trust-item { border-left: 1px solid rgba(184,194,224,.1); }
+    .trust-icon { display: grid; width: 31px; height: 31px; place-items: center; border: 1px solid rgba(160,142,255,.19); border-radius: 10px; color: #b8a5ff; background: rgba(154,123,255,.09); }
+
+    .section { padding: 16px 0 92px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 25px; margin-bottom: 27px; }
+    .section-kicker { margin: 0 0 9px; color: #a795ff; font-size: 10px; font-weight: 850; letter-spacing: 1.7px; text-transform: uppercase; }
+    h2 { margin: 0; font-size: clamp(28px, 4vw, 39px); line-height: 1.12; letter-spacing: -1.8px; }
+    .section-heading p { max-width: 360px; margin: 0 0 3px; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .library-status { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; color: #9ca6bc; background: rgba(255,255,255,.025); font-size: 10px; font-weight: 750; white-space: nowrap; }
+    .library-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #a18aff; }
+
+    .empty-state {
+      position: relative;
+      display: grid;
+      min-height: 280px;
+      place-items: center;
+      padding: 36px 24px;
+      overflow: hidden;
+      border: 1px dashed rgba(174,166,223,.27);
+      border-radius: var(--radius);
+      background: linear-gradient(120deg, rgba(25,28,47,.68), rgba(15,28,39,.63));
+      text-align: center;
+    }
+    .empty-state::before, .empty-state::after { position: absolute; width: 230px; height: 230px; content: ""; border: 1px solid rgba(159,141,255,.09); border-radius: 50%; pointer-events: none; }
+    .empty-state::before { top: -140px; left: -100px; box-shadow: 0 0 0 25px rgba(159,141,255,.025), 0 0 0 50px rgba(159,141,255,.02); }
+    .empty-state::after { right: -120px; bottom: -160px; box-shadow: 0 0 0 25px rgba(104,226,229,.025), 0 0 0 50px rgba(104,226,229,.02); }
+    .empty-content { position: relative; z-index: 1; max-width: 470px; }
+    .empty-icon {
+      display: grid;
+      width: 61px;
+      height: 61px;
+      margin: 0 auto 17px;
+      place-items: center;
+      border: 1px solid rgba(180,156,255,.27);
+      border-radius: 19px;
+      color: #c1b2ff;
+      background: linear-gradient(145deg, rgba(154,123,255,.2), rgba(104,226,229,.09));
+      box-shadow: 0 10px 36px rgba(112,91,197,.12);
+    }
+    .empty-content h3 { margin: 0 0 8px; font-size: 20px; letter-spacing: -.6px; }
+    .empty-content p { margin: 0; color: #9da7bd; font-size: 13px; line-height: 1.75; }
+
+    .features { padding: 75px 0 92px; border-top: 1px solid rgba(184,194,224,.08); background: linear-gradient(180deg, rgba(255,255,255,.012), transparent); }
+    .features-intro { max-width: 570px; margin-bottom: 29px; }
+    .features-intro > p:last-child { margin: 13px 0 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .feature-card {
+      min-height: 190px;
+      padding: 23px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: linear-gradient(145deg, rgba(25,30,47,.74), rgba(17,21,34,.72));
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .feature-card:hover { transform: translateY(-3px); border-color: rgba(171,151,255,.28); background: linear-gradient(145deg, rgba(32,35,57,.86), rgba(17,25,38,.8)); }
+    .feature-icon { display: grid; width: 39px; height: 39px; margin-bottom: 18px; place-items: center; border: 1px solid rgba(159,141,255,.2); border-radius: 12px; color: #b5a2ff; background: rgba(154,123,255,.1); }
+    .feature-card:nth-child(2) .feature-icon { border-color: rgba(104,226,229,.19); color: #7ee0df; background: rgba(104,226,229,.08); }
+    .feature-card:nth-child(3) .feature-icon { border-color: rgba(165,241,193,.18); color: #a5e7ba; background: rgba(165,241,193,.08); }
+    .feature-card h3 { margin: 0 0 7px; font-size: 15px; letter-spacing: -.35px; }
+    .feature-card p { max-width: 290px; margin: 0; color: #99a3b8; font-size: 12px; line-height: 1.75; }
+
+    .closing { padding: 0 0 82px; }
+    .closing-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+      padding: 30px 34px;
+      border: 1px solid rgba(170,153,255,.2);
+      border-radius: 20px;
+      background:
+        radial-gradient(ellipse at 80% 0%, rgba(104,226,229,.12), transparent 44%),
+        linear-gradient(110deg, rgba(91,70,160,.24), rgba(22,34,49,.78));
+    }
+    .closing-panel p { margin: 7px 0 0; color: #aab3c9; font-size: 12px; }
+    .closing-panel h2 { font-size: 24px; letter-spacing: -.8px; }
+
+    .site-footer { border-top: 1px solid rgba(184,194,224,.09); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 84px; }
+    .footer-copy { color: #778198; font-size: 11px; }
+    .footer-links { display: flex; gap: 22px; }
+    .footer-links a { color: #929bb0; font-size: 11px; font-weight: 650; }
+    .footer-links a:hover { color: #fff; }
+
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 17px; }
+    .game-card { overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); transition: transform .2s ease, border-color .2s ease; }
+    .game-card:hover { transform: translateY(-4px); border-color: rgba(173,153,255,.35); }
+    .game-card-art { display: grid; aspect-ratio: 16 / 10; place-items: center; background: linear-gradient(135deg, #55418e, #286c78); color: white; }
+    .game-card-art span { font-size: 42px; font-weight: 900; opacity: .85; }
+    .game-card-body { padding: 15px; }
+    .game-card h3 { margin: 0 0 5px; font-size: 15px; }
+    .game-card p { margin: 0; color: var(--muted); font-size: 12px; }
+    .game-card-link { display: block; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 900px) {
+      .hero { padding-top: 55px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 39px; }
+      .hero-copy { max-width: 700px; }
+      .showcase { width: min(100%, 620px); margin-inline: auto; }
+      .trust-strip { margin-bottom: 68px; }
+    }
+    @media (max-width: 640px) {
+      .container { width: min(var(--content), calc(100% - 34px)); }
+      .nav-wrap { min-height: 67px; }
+      .brand-mark { width: 36px; height: 36px; }
+      .brand-name { font-size: 18px; }
+      .nav-play { min-height: 39px; padding-inline: 12px; font-size: 11px; }
+      .menu-toggle { display: grid; }
+      .nav-links {
+        position: absolute;
+        top: 66px;
+        right: 17px;
+        left: 17px;
+        display: none;
+        align-items: stretch;
+        gap: 0;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: rgba(17,21,34,.98);
+        box-shadow: 0 18px 55px rgba(0,0,0,.38);
+      }
+      .nav-links.open { display: flex; flex-direction: column; }
+      .nav-links a { padding: 12px; border-radius: 9px; }
+      .nav-links a:hover { background: rgba(255,255,255,.05); }
+      .hero { padding: 49px 0 42px; }
+      h1 { margin-top: 20px; font-size: clamp(46px, 13vw, 64px); letter-spacing: -3.7px; }
+      .hero-copy > p { font-size: 14px; }
+      .hero-buttons { gap: 9px; margin-top: 24px; }
+      .button-primary, .button-secondary { min-height: 46px; padding-inline: 14px; font-size: 12px; }
+      .showcase { min-height: 350px; padding: 12px; border-radius: 21px; }
+      .game-scene { height: 235px; }
+      .trust-strip { margin: 3px 0 56px; }
+      .trust-inner { grid-template-columns: 1fr; padding-block: 7px; }
+      .trust-item { justify-content: flex-start; min-height: 48px; padding-left: 15%; font-size: 11px; }
+      .trust-item + .trust-item { border-top: 1px solid rgba(184,194,224,.08); border-left: 0; }
+      .trust-icon { width: 27px; height: 27px; }
+      .section { padding-bottom: 69px; }
+      .section-heading { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+      .section-heading p { max-width: 430px; }
+      .empty-state { min-height: 260px; padding-inline: 20px; }
+      .features { padding: 58px 0 65px; }
+      .feature-grid { grid-template-columns: 1fr; gap: 11px; }
+      .feature-card { min-height: auto; padding: 20px; }
+      .feature-icon { margin-bottom: 13px; }
+      .closing { padding-bottom: 58px; }
+      .closing-panel { align-items: flex-start; flex-direction: column; padding: 25px 22px; }
+      .closing-panel .button-primary { width: 100%; }
+      .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; gap: 12px; padding-block: 22px; }
+      .footer-links { gap: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="#" aria-label="SuperGame home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+            <path d="M7.2 8.2h9.6a4.1 4.1 0 0 1 3.9 5.3l-.7 2.3a2.2 2.2 0 0 1-3.6 1l-2-1.7H9.6l-2 1.7a2.2 2.2 0 0 1-3.6-1l-.7-2.3a4.1 4.1 0 0 1 3.9-5.3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M8 10.4v4M6 12.4h4M16.3 11.1h.01M18.1 13h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-name">Super<span>Game</span></span>
+      </a>
+
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="#arcade">Discover</a>
+        <a href="#about">About</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="nav-play" href="#arcade">
+          Explore games
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Welcome to the arcade</div>
+          <h1>Your next game<br>starts <span class="gradient">right here.</span></h1>
+          <p>A place for fun, original games you can jump into straight from your browser. No installs, no fuss. Just find a game and play.</p>
+          <div class="hero-buttons">
+            <a class="button-primary" href="#arcade">
+              Explore the arcade
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="button-secondary" href="#about">What is SuperGame?</a>
+          </div>
+          <div class="hero-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Free to play · Plays right in your browser
+          </div>
+        </div>
+
+        <div class="showcase" aria-label="A preview of the SuperGame arcade">
+          <div class="showcase-top">
+            <span class="showcase-label">SUPERGAME&nbsp; / &nbsp;ARCADE</span>
+            <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+          <div class="game-scene" aria-hidden="true">
+            <span class="scene-caption">A NEW WORLD AWAITS</span>
+            <span class="scene-star star-a"></span><span class="scene-star star-b"></span><span class="scene-star star-c"></span><span class="scene-star star-d"></span>
+            <span class="scene-sun"></span>
+            <span class="cloud cloud-a"></span><span class="cloud cloud-b"></span>
+            <span class="mountain mountain-a"></span><span class="mountain mountain-b"></span><span class="mountain mountain-c"></span>
+            <span class="ridge"></span>
+            <span class="platform"></span>
+            <span class="pixel-player"></span>
+            <span class="scene-chip">PLAYER 01 · READY</span>
+          </div>
+          <div class="showcase-bottom">
+            <div>
+              <strong>The next adventure is loading.</strong>
+              <span>New games are on the way to SuperGame.</span>
+            </div>
+            <span class="coming-tag">Coming soon</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="trust-strip" aria-label="SuperGame highlights">
+      <div class="container trust-inner">
+        <div class="trust-item">
+          <span class="trust-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5H5v14h14v-3M10 14 20 4m-7 0h7v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Play in your browser
+        </div>
+        <div class="trust-item">
+          <span class="trust-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/></svg></span>
+          No downloads needed
+        </div>
+        <div class="trust-item">
+          <span class="trust-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5 14.6 9l6 .8-4.3 4.2 1 6-5.3-2.8-5.3 2.8 1-6-4.3-4.2 6-.8L12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+          Made for fun
+        </div>
+      </div>
+    </div>
+
+    <section class="section" id="arcade">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Pick your next adventure</p>
+            <h2>Explore the arcade</h2>
+          </div>
+          <div>
+            <p>Every game is made to be easy to jump into. Find one that catches your eye and let the fun begin.</p>
+          </div>
+        </div>
+        <div class="library-status"><span class="library-status-dot"></span><span id="gameCount">0 games available</span></div>
+        <div id="gameLibrary" class="game-grid" aria-live="polite">
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-content">
+              <div class="empty-icon" aria-hidden="true">
+                <svg width="29" height="29" viewBox="0 0 24 24" fill="none"><path d="M7.2 8.2h9.6a4.1 4.1 0 0 1 3.9 5.3l-.7 2.3a2.2 2.2 0 0 1-3.6 1l-2-1.7H9.6l-2 1.7a2.2 2.2 0 0 1-3.6-1l-.7-2.3a4.1 4.1 0 0 1 3.9-5.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 10.4v4M6 12.4h4M16.3 11.1h.01M18.1 13h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </div>
+              <h3>The arcade is getting ready.</h3>
+              <p>We're putting the finishing touches on the very first SuperGame. Check back soon — your next favorite game is on its way.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="about">
+      <div class="container">
+        <div class="features-intro">
+          <p class="section-kicker">The SuperGame idea</p>
+          <h2>Less waiting. More playing.</h2>
+          <p>SuperGame is a growing collection of original browser games. Each one is built to be picked up and played right here — whether you have a minute to spare or an afternoon to fill.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M8 5H5v14h14v-3M10 14 20 4m-7 0h7v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Click and play</h3>
+            <p>Games launch right in your browser. No installer, launcher, or extra setup standing between you and the fun.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="m12 3 2.4 5.1 5.6.8-4 3.9.9 5.6-4.9-2.6-4.9 2.6.9-5.6-4-3.9 5.6-.8L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
+            <h3>Original games</h3>
+            <p>Every title is created for the SuperGame arcade, with its own idea, style, and little world to explore.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3v18m9-9H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/></svg></div>
+            <h3>Always growing</h3>
+            <p>The arcade will keep expanding with new experiences. There is always something new to look forward to.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="container">
+        <div class="closing-panel">
+          <div>
+            <h2>Ready when you are.</h2>
+            <p>Your next little escape is just around the corner.</p>
+          </div>
+          <a class="button-primary" href="#arcade">Visit the arcade <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#" aria-label="SuperGame home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M7.2 8.2h9.6a4.1 4.1 0 0 1 3.9 5.3l-.7 2.3a2.2 2.2 0 0 1-3.6 1l-2-1.7H9.6l-2 1.7a2.2 2.2 0 0 1-3.6-1l-.7-2.3a4.1 4.1 0 0 1 3.9-5.3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 10.4v4M6 12.4h4M16.3 11.1h.01M18.1 13h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <span class="brand-name">Super<span>Game</span></span>
+      </a>
+      <span class="footer-copy">© <span id="year">2026</span> SuperGame. Made for fun.</span>
+      <div class="footer-links"><a href="#arcade">Games</a><a href="#about">About</a><a href="https://github.com/bradleysouciercomputer/SuperGame" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
+    </div>
+  </footer>
+
+  <script>
+    // Add each new game here when it is ready to publish.
+    // Example: { title: "Game name", description: "A short description.", url: "games/game-name/", category: "Arcade", initial: "G" }
+    const games = [];
+
+    const library = document.getElementById("gameLibrary");
+    const gameCount = document.getElementById("gameCount");
+
+    function renderGames() {
+      gameCount.textContent = games.length + (games.length === 1 ? " game available" : " games available");
+      if (games.length === 0) return;
+
+      library.replaceChildren();
+      games.forEach(function (game) {
+        const link = document.createElement("a");
+        link.className = "game-card game-card-link";
+        link.href = game.url;
+
+        const art = document.createElement("div");
+        art.className = "game-card-art";
+        const initial = document.createElement("span");
+        initial.textContent = game.initial || game.title.slice(0, 1).toUpperCase();
+        art.appendChild(initial);
+
+        const body = document.createElement("div");
+        body.className = "game-card-body";
+        const title = document.createElement("h3");
+        title.textContent = game.title;
+        const description = document.createElement("p");
+        description.textContent = game.description || game.category || "Play now";
+        body.append(title, description);
+        link.append(art, body);
+        library.appendChild(link);
+      });
+    }
+
+    renderGames();
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+    menuToggle.addEventListener("click", function () {
+      const isOpen = navLinks.classList.toggle("open");
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuToggle.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+    });
+    navLinks.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        navLinks.classList.remove("open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation menu");
+      });
+    });
+  </script>
+</body>
+</html>
