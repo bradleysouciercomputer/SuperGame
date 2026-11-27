@@ -362,7 +362,7 @@
       }
 
       function createRunner(){
-        runner=new THREE.Group();runner.position.set(laneX[lane],0,playerZ);scene.add(runner);
+        runner=new THREE.Group();runner.rotation.y=Math.PI;runner.position.set(laneX[lane],0,playerZ);scene.add(runner);
         runnerBody=new THREE.Group();runner.add(runnerBody);
         const bodyGeo=new THREE.CapsuleGeometry(.34,.66,5,10);
         const torso=new THREE.Mesh(bodyGeo,mats.playerBody);torso.position.y=1.22;torso.castShadow=true;runnerBody.add(torso);
